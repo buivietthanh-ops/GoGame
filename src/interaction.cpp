@@ -6,6 +6,10 @@ void MakeSound(State &game)
 {
     PlaySound(game.click);
 }
+void MakeSoundGetScore(State &game)
+{
+    PlaySound(game.GetScore);
+}
 position real_pos(Vector2 mousePos, int cell_sz)
 {
     int mul_x=(int)mousePos.x/cell_sz;
@@ -37,8 +41,8 @@ void InputStone(State &game, int &invalid)
                 }
                     
                 game.board[Pos.x/game.cell_sz][Pos.y/game.cell_sz]=game.PlayerPos;
-                
-                CaptureStone(game,invalid);
+                int getscore=0;
+                CaptureStone(game,invalid,getscore);
                 if (invalid)
                 {
                     for (int x=1;x<=19;x++) 
@@ -60,6 +64,7 @@ void InputStone(State &game, int &invalid)
                         }
                     }
                     game.SaveBoard.push_back(board);
+                    if (getscore) MakeSoundGetScore(game);
                 }
             }
             //cout<<Pos.x<<' '<<Pos.y<<endl;

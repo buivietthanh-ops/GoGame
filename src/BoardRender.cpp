@@ -7,6 +7,7 @@
 void DrawBoard(State &game)
 {
     ClearBackground(RAYWHITE);
+    game.background=game.ModernBoard; //
     DrawTexture(game.background,0,0,WHITE);
     for (int x=1;x<=game.size;x++)
     {
@@ -21,6 +22,7 @@ void DrawBoard(State &game)
             }
         }
     }
+    if (game.PlayerPos==1) DrawText("Black Turn",100,75,30,BLACK); else DrawText("White Turn",100,75,30,WHITE);
 }
 void DrawInvalidOption(State &game, int x, int y)
 {

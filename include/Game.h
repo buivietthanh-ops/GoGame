@@ -11,9 +11,10 @@ struct State
 {
     int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curMode,curStart,curPlayers,curComputer;
     // option 0 -> nothing , option 1 -> start
-    Texture2D background,ButtonStart,External,ButtonStartFade,GameMode,GameModeFade,TwoOptions,TwoPlayers,Computer,InvalidOption;
+    Texture2D background,ButtonStart,External,ButtonStartFade,GameMode,GameModeFade,TwoOptions,TwoPlayers,Computer,InvalidOption
+    ,ModernBoard;
     vector<vector<vector<int>>> SaveBoard;
-    Sound click;
+    Sound click,GetScore;
     State()
     {
         for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) board[x][y]=0;
@@ -38,5 +39,7 @@ struct State
         Computer=LoadTexture("assets/Computer.png");
         click=LoadSound("assets/Click.wav");
         InvalidOption=LoadTexture("assets/InvalidOption.png");
+        GetScore=LoadSound("assets/GetScore.wav");
+        ModernBoard=LoadTexture("assets/ModernBoard.png");
     }
 };

@@ -4,5 +4,6 @@
 #include "src/GameLogic.cpp"
 #include <raylib.h>
 
-void InputStone(State &game);
-void MakeSound(State &game, int &invalid);
+void InputStone(State &game, int &invalid);
+void MakeSound(State &game);
+void MakeSoundGetScore(State &game);

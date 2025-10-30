@@ -6,7 +6,7 @@ int ck[23][23];
 int ud[]={0,0,-1,1};
 int lr[]={-1,1,0,0};
 
-void CaptureStone(State &game, int &invalid)
+void CaptureStone(State &game, int &invalid, int &getscore)
 {
     for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) ck[x][y]=0;
     bool ktr[3];
@@ -48,6 +48,7 @@ void CaptureStone(State &game, int &invalid)
             }
         }
     }
+    if (contain.size()>0) getscore=1;
     if (ktr[game.PlayerPos]==0)
     {
         for (pair<int,int> pos:contain)
