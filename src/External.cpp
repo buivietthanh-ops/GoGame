@@ -7,15 +7,18 @@ void InputExternal(State &game)
     {
         MakeSound(game);
         Vector2 mousePos=GetMousePosition();
-        // 222 80
-        if (mousePos.x>=600-111 && mousePos.x<=600-111+222 && mousePos.y>=400-40 && mousePos.y<=400-40+80)
+        if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2 && mousePos.y<=400+85/2)
         {
             game.option=1;
         }
         
-        if (mousePos.x>=600-120 && mousePos.x<=600-120+240 && mousePos.y>=400+150 && mousePos.y<=400+150+75)
+        if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2+100 && mousePos.y<=400+85/2+100)
         {
             game.option=3;
+        }
+        if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2+200 && mousePos.y<=400+85/2+200)
+        {
+            game.option=4;
         }
     }
 }
@@ -26,19 +29,43 @@ void DrawExternal(State &game)
     DrawTexture(game.External,0,0,WHITE);
     Vector2 mousePos=GetMousePosition();
     // Start
-    if (mousePos.x>=600-111 && mousePos.x<=600-111+222 && mousePos.y>=400-40 && mousePos.y<=400-40+80)
+    if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2 && mousePos.y<=400+85/2)
     {
         if (game.curStart==0) MakeSound(game),game.curStart=1;
-        DrawTexture(game.ButtonStartFade,600-111,400-40,WHITE);
+        DrawTexture(game.ButtonStartFade,600-250/2,400-85/2,WHITE);
+        DrawTextEx(game.Font,"Start",(Vector2){600-150/2+18,400-80/2+6},60,3,BLACK);
         
-    } else game.curStart=0,DrawTexture(game.ButtonStart,600-111,400-40,WHITE);
+    } else 
+    {
+        game.curStart=0;
+        DrawTexture(game.ButtonStart,600-250/2,400-85/2,WHITE);
+        DrawTextEx(game.Font,"Start",(Vector2){600-150/2+18,400-80/2+6},60,3,{0,0,0,200});
+    }
     // Mode
-    if (mousePos.x>=600-120 && mousePos.x<=600-120+240 && mousePos.y>=400+150 && mousePos.y<=400+150+75)
+    if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2+100 && mousePos.y<=400+85/2+100)
     {
         if (game.curMode==0) MakeSound(game),game.curMode=1;
-        DrawTexture(game.GameModeFade,600-120,400+150,WHITE);
-    } else game.curMode=0,DrawTexture(game.GameMode,600-120,400+150,WHITE);
-    
+        DrawTexture(game.ButtonStartFade,600-250/2,400-85/2+100,WHITE);
+        DrawTextEx(game.Font,"Mode",(Vector2){600-150/2+18,400-80/2+100+6},60,3,BLACK);
+    } else 
+    {
+        game.curMode=0;
+        DrawTexture(game.ButtonStart,600-250/2,400-85/2+100,WHITE);
+        DrawTextEx(game.Font,"Mode",(Vector2){600-150/2+18,400-80/2+100+6},60,3,{0,0,0,200});
+    }
+    // Setting
+    //DrawTexture(game.SettingButton,600-120,400+190,WHITE);
+    if (mousePos.x>=600-250/2 && mousePos.x<=600+250/2 && mousePos.y>=400-85/2+200 && mousePos.y<=400+85/2+200)
+    {
+        if (game.curSetting==0) MakeSound(game),game.curSetting=1;
+        DrawTexture(game.ButtonStartFade,600-250/2,400-85/2+200,WHITE);
+        DrawTextEx(game.Font,"Setting",(Vector2){600-150/2+6,400-80/2+200+6},60,3,BLACK);
+    } else 
+    {
+        game.curSetting=0;
+        DrawTexture(game.ButtonStart,600-250/2,400-85/2+200,WHITE);
+        DrawTextEx(game.Font,"Setting",(Vector2){600-150/2+6,400-80/2+200+6},60,3,{0,0,0,200});
+    }
 }
 
 void InputOptions(State &game)
@@ -66,6 +93,16 @@ void InputOptions(State &game)
             game.option=0;
         }
     } else game.curComputer=0;
-
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) MakeSound(game);
 }
-
+void PopUp(State &game)
+{
+    if (game.PopUpScale+0.05f-game.PopUpScale/50.0<=1.0f)
+    {
+        game.PopUpScale+=0.05f-game.PopUpScale/50.0;
+    }
+    float lenX=900.0*game.PopUpScale,lenY=600.0*game.PopUpScale;
+    float X=600.0-lenX/2.0,Y=400.0-lenY/2.0;
+    DrawRectangleRounded(Rectangle{X,Y,lenX,lenY},0.1f,20,Fade(RAYWHITE,0.9f));
+    DrawRectangleRoundedLines(Rectangle{X,Y,lenX,lenY},0.1f,20,BLACK);
+}

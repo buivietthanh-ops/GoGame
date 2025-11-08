@@ -17,12 +17,28 @@ void DrawBoard(State &game)
             {
                 double pixelX=x*game.cell_sz+game.outside;
                 double pixelY=y*game.cell_sz;
-                Color cell_col = (game.board[x][y]==1? BLACK : WHITE);
-                DrawCircle(pixelX, pixelY,game.cell_sz/3,cell_col);
+                Color shadow= (Color){0,0,0,80};
+                DrawCircle(pixelX+4, pixelY+4,game.cell_sz/3,shadow);
+                if (game.board[x][y]==1)
+                {
+                    DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,DARKGRAY,BLACK); 
+                }
+                else 
+                {
+                    DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,WHITE,LIGHTGRAY);
+                    
+                }
             }
         }
     }
-    if (game.PlayerPos==1) DrawText("Black Turn",100,75,30,BLACK); else DrawText("White Turn",100,75,30,WHITE);
+    if (game.PlayerPos==1) 
+    {
+        
+        DrawTextEx(game.Font,"Black Turn",(Vector2){100,75},60,2,BLACK);
+    } else 
+    {
+        DrawTextEx(game.Font,"White Turn",(Vector2){100,75},60,2,WHITE);
+    }
 }
 void DrawInvalidOption(State &game, int x, int y)
 {

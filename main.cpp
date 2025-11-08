@@ -21,6 +21,7 @@ int main () {
     State game;
     // 0 -> stay    [1 -> Build board    2 -> Play game] (Option)
     // 0 -> No      1-> 2 players       2-> AI (Mode)
+    // option 4 -> setting
     int time=0,used=0;
     int x=rand()%(1200-500),y=rand()%(800-300);
     while (WindowShouldClose() == false){
@@ -65,7 +66,7 @@ int main () {
                 {
                     time=0;
                     used=0;
-                } else DrawText("Invalid!",500,300,50,GREEN),DrawText("Invalid!",500,302,50,BLACK);
+                } else DrawTextEx(game.Font,"Invalid!",(Vector2){500,300},100,5,LIGHTGRAY),DrawTextEx(game.Font,"Invalid!",(Vector2){503,303},100,5,BLACK);
             }
             
         } else
@@ -76,6 +77,10 @@ int main () {
             InputOptions(game);
 
             
+        }
+        if (game.option==4)
+        {
+            PopUp(game);
         }
         EndDrawing();
     }
