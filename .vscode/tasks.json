@@ -16,7 +16,7 @@
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=*.cpp",
+                    "OBJS=*main.cpp src/interaction.cpp src/BoardRender.cpp src/External.cpp src/GameLogic.cpp",
                     "BUILD_MODE=DEBUG"
                 ]
             },
@@ -57,7 +57,7 @@
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=*.cpp"
+                    "OBJS=*main.cpp src/interaction.cpp src/BoardRender.cpp src/External.cpp src/GameLogic.cpp"
                 ]
             },
             "osx": {

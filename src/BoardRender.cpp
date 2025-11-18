@@ -7,8 +7,8 @@
 void DrawBoard(State &game)
 {
     ClearBackground(RAYWHITE);
-    game.background=game.ModernBoard; //
-    DrawTexture(game.background,0,0,WHITE);
+    //game.Board=game.ModernBoard; //
+    DrawTexture(game.PlayBoard,0,0,WHITE);
     for (int x=1;x<=game.size;x++)
     {
         for (int y=1;y<=game.size;y++)
@@ -21,17 +21,19 @@ void DrawBoard(State &game)
                 DrawCircle(pixelX+4, pixelY+4,game.cell_sz/3,shadow);
                 if (game.board[x][y]==1)
                 {
-                    DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,DARKGRAY,BLACK); 
+                    if (game.isClassic) DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,DARKGRAY,BLACK); 
+                    else DrawTexture(game.BlackStone,pixelX-13,pixelY-13,WHITE);
                 }
                 else 
                 {
-                    DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,WHITE,LIGHTGRAY);
+                    if (game.isClassic) DrawCircleGradient(pixelX,pixelY,game.cell_sz/3,WHITE,LIGHTGRAY);
+                    else  DrawTexture(game.WhiteStone,pixelX-13,pixelY-13,WHITE);
                     
                 }
             }
         }
     }
-    if (game.PlayerPos==1) 
+    if (game.PlayerPos==1)
     {
         
         DrawTextEx(game.Font,"Black Turn",(Vector2){100,75},60,2,BLACK);
