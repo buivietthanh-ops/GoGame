@@ -16,6 +16,8 @@ int main () {
     SetTargetFPS(60);
     InitAudioDevice();
     State game;
+    PlayMusicStream(game.music[0].first);
+    PlayMusicStream(game.music[1].first);
     // 0 -> stay    [1 -> Build board    2 -> Play game] (Option)
     // 0 -> No      1-> 2 players       2-> AI (Mode)
     // option 4 -> setting
@@ -39,6 +41,36 @@ int main () {
     stonebutton->keep(modernstonebutton);
     modernstonebutton->keep(stonebutton);
 
+    Button* themeonebutton= new ThemeOneButton(450,480,650,510);
+    Button* themesecondbutton= new ThemeSecondButton(450,520,650,550);
+    themeonebutton->keep(themesecondbutton);
+    themesecondbutton->keep(themeonebutton);
+
+
+    string line="Placing Stone";
+    Button* placingstonebutton= new SoundEffectButton(700+80+150+10, 250+75+40, 700+80+150+10+21, 250+75+40+21,
+        700+50, 250+75+40, 700+50+21, 250+75+40+21,
+        &game.sound[0].Click, &game.sound[1].Click,line);
+    
+    line = "Capturing Stone";
+    Button* capturestonebutton= new SoundEffectButton(700+80+150+10,250+75+75+40,700+80+150+10+21,250+75+75+40+21,
+        700+50,250+75+75+40,700+50+21,250+75+75+40+21,
+        &game.sound[0].Getscore, &game.sound[1].Getscore,line);
+
+    line = "End-Game Scoring";
+    Button* endgamebutton= new SoundEffectButton(
+        700+80+150+10,250+75+75+75+40,700+80+150+10+21,250+75+75+75+40+21,
+        700+50,250+75+75+75+40,700+50+21,250+75+75+75+40+21,
+        &game.sound[0].Endgame, &game.sound[1].Endgame,line);
+    
+    line = "Background Music";
+    Button* backgroundmusic= new MusicButton(
+        700+80+150+10,250+40,700+80+150+10+21,250+40+21,
+        700+50,250+40,700+50+21,250+40+21,
+        &game.music[0], &game.music[1],line);
+
+    Player* player1 = new Player();
+    Player* player2 = new Player();
 
     vector<Button*> button;
     button.push_back(boardthemebutton);
@@ -46,7 +78,17 @@ int main () {
     button.push_back(exitbutton);
     button.push_back(stonebutton);
     button.push_back(modernstonebutton);
+    button.push_back(themeonebutton);
+    button.push_back(themesecondbutton);
+    button.push_back(placingstonebutton);
+    button.push_back(capturestonebutton);
+    button.push_back(endgamebutton);
+    button.push_back(backgroundmusic);
+
     while (WindowShouldClose() == false){
+
+        UpdateMusicStream(game.music[game.isSound].first);
+        
         BeginDrawing();
         if (game.option==0)
         {
@@ -104,8 +146,10 @@ int main () {
          else
         {
             int invalid=0;
-            InputStone(game,invalid);
             DrawBoard(game);
+            if (game.PlayerPos==1)
+            player1->InputStone(game,invalid); else player2->InputStone(game, invalid);
+            
             if (invalid)
             {
                 time=GetTime();
@@ -122,6 +166,9 @@ int main () {
         }
         EndDrawing();
     }
+    UnloadMusicStream(game.music[0].first);
+    UnloadMusicStream(game.music[1].first);
+
     CloseAudioDevice();
     CloseWindow();
 }

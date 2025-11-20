@@ -6,16 +6,20 @@ struct position
 {
     int x,y;
 };
-
+struct StateSound
+{
+    pair<Sound,float> Click,Getscore,Endgame;
+};
 struct State
 {
-    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic;
+    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic,isSound;
     double PopUpScale;
-    // option 0 -> nothing , option 1 -> start
     Texture2D Board,ButtonStart,External,ButtonStartFade,TwoOptions,TwoPlayers,Computer,InvalidOption
-    ,ModernBoard,SettingBackground,PlayBoard,ExitButton,BlackStone,WhiteStone;
+    ,ModernBoard,SettingBackground,PlayBoard,ExitButton,BlackStone,WhiteStone,MinusButton,PlusButton
+    ,MusicButton,MuteMusicButton,SoundButton,MuteSoundButton;
     vector<vector<vector<int>>> SaveBoard;
-    Sound click,GetScore;
+    StateSound sound[2];
+    pair<Music,float> music[2];
     Font Font;
     State()
     {
@@ -36,13 +40,22 @@ struct State
         TwoOptions=LoadTexture("assets/TwoOptions.png");
         TwoPlayers=LoadTexture("assets/TwoPlayers.png");
         Computer=LoadTexture("assets/Computer.png");
-        click=LoadSound("assets/Click.wav");
-        InvalidOption=LoadTexture("assets/InvalidOption.png");
-        GetScore=LoadSound("assets/GetScore.wav"); // SOUND
+
+        sound[0].Click={LoadSound("assets/Click.wav"),1};
+        sound[1].Click={LoadSound("assets/Click2.wav"),1};
+        sound[0].Getscore={LoadSound("assets/GetScore.wav"),1}; // SOUND
+        sound[1].Getscore={LoadSound("assets/GetScore2.wav"),1};
+        sound[0].Endgame={LoadSound("assets/EndGame.wav"),1};
+        music[0]={LoadMusicStream("assets/BackgroundMusic.mp3"),1};
+        music[1]={LoadMusicStream("assets/BackgroundMusic2.mp3"),1};
+        isSound=0;
+        
+
         ModernBoard=LoadTexture("assets/ModernBoard.png");
         ExitButton=LoadTexture("assets/ExitButton.png");
         
-        
+        InvalidOption=LoadTexture("assets/InvalidOption.png");
+
         Font=LoadFontEx("assets/MaShanZheng-Regular.ttf",256,nullptr,0); // FONT
         SettingBackground=LoadTexture("assets/SettingBackground.png");
         SetTextureFilter(SettingBackground, TEXTURE_FILTER_TRILINEAR);
@@ -50,5 +63,13 @@ struct State
         BlackStone=LoadTexture("assets/BlackStone.png");
         WhiteStone=LoadTexture("assets/WhiteStone.png");
         isClassic=1;
+
+        MinusButton=LoadTexture("assets/MinusButton.png");
+        PlusButton=LoadTexture("assets/PlusButton.png");
+
+        MusicButton=LoadTexture("assets/MusicButton.png");
+        MuteMusicButton=LoadTexture("assets/MuteMusicButton.png");
+        SoundButton=LoadTexture("assets/SoundButton.png");
+        MuteSoundButton=LoadTexture("assets/MuteSoundButton.png");
     }
 };

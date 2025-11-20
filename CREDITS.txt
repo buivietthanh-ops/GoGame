@@ -1,0 +1,29 @@
+CREDITS
+-----------------------------------------------------------
+
+
+Game Programming
+- Go Game
+(Made by Bùi Viết Thành)
+
+Sound Effects
+- Sourced from Google
+(Original creators unknown)
+
+Music
+- "Game Music Loop 12"
+- "Chill Music Loop"
+(Composed by XtremeFreddy)
+Sources (producer's account):
+-> https://pixabay.com/users/xtremefreddy-32332307
+
+Art
+- Images sourced from Pinterest
+(Original creators unknown)
+
+Font
+- "Ma Shan Zheng"
+(Designed by Ma Shan Zheng)
+
+Engine
+- raylib

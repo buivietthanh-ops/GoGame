@@ -4,11 +4,11 @@ using namespace std;
 vector<vector<int>> board (23, vector<int>(23,0));
 void MakeSound(State &game)
 {
-    PlaySound(game.click);
+    PlaySound(game.sound[game.isSound].Click.first);
 }
 void MakeSoundGetScore(State &game)
 {
-    PlaySound(game.GetScore);
+    PlaySound(game.sound[game.isSound].Getscore.first);
 }
 position real_pos(Vector2 mousePos, int cell_sz)
 {
@@ -21,15 +21,22 @@ position real_pos(Vector2 mousePos, int cell_sz)
     if (posY*2.0<=cell_sz) board.y=cell_sz*mul_y; else board.y=cell_sz*(mul_y+1);
     return board;
 }
-void InputStone(State &game, int &invalid)
+void Player::InputStone(State &game, int &invalid)
 {
 
+    Vector2 mousePos = GetMousePosition();
+    position Pos=real_pos(mousePos,game.cell_sz);
+    Pos.x-=game.outside;
+    if (Pos.x/game.cell_sz>=1 && Pos.x/game.cell_sz<=game.size && Pos.y/game.cell_sz>=1 && Pos.y/game.cell_sz<=game.size && game.board[Pos.x/game.cell_sz][Pos.y/game.cell_sz]==0)
+    {
+        DrawCircle(Pos.x+game.outside,Pos.y,game.cell_sz/3, (Color){0,0,0,60});
+    }
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
        {
             MakeSound(game);
-            Vector2 mousePos = GetMousePosition();
-            position Pos=real_pos(mousePos,game.cell_sz);
-            Pos.x-=game.outside;
+            //Vector2 mousePos = GetMousePosition();
+            //position Pos=real_pos(mousePos,game.cell_sz);
+            //Pos.x-=game.outside;
             if (Pos.x/game.cell_sz>=1 && Pos.x/game.cell_sz<=game.size && Pos.y/game.cell_sz>=1 && Pos.y/game.cell_sz<=game.size && game.board[Pos.x/game.cell_sz][Pos.y/game.cell_sz]==0)
             {
                 for (int x=1;x<=19;x++) 
@@ -70,4 +77,5 @@ void InputStone(State &game, int &invalid)
             //cout<<Pos.x<<' '<<Pos.y<<endl;
        }
 }
+
 

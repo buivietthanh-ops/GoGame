@@ -212,11 +212,27 @@ void StoneButton::Draw(State &game)
 {
     DrawCircleGradient(x+game.cell_sz/3,y+game.cell_sz/3,game.cell_sz/3,DARKGRAY,BLACK); 
     DrawCircleGradient(x+game.cell_sz/3+30,y+game.cell_sz/3,game.cell_sz/3,WHITE,LIGHTGRAY);
-    if (used) DrawRectangle(x,y,57,27, (Color){0,0,0,60});
+    if (used)
+    {
+        DrawRectangleRounded(
+           (Rectangle){x,y,57,27}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+    }
     if (Button::Inside())
     {
         if (Cur==0) MakeSound(game),Cur=1;
-        if (!used) DrawRectangle(x,y,57,27, (Color){0,0,0,60});
+        if (!used)
+        {
+            DrawRectangleRounded(
+                (Rectangle){x,y,57,27}, 
+                0.5f,
+                20,
+                (Color){0,0,0,60}
+            );
+        }
     } else
     {
         Cur=0;
@@ -243,11 +259,27 @@ void ModernStoneButton::Draw(State &game)
 {
     DrawTexture(game.BlackStone,x,y,WHITE);
     DrawTexture(game.WhiteStone,x+30,y,WHITE);
-    if (used) DrawRectangle(x,y,57,27, (Color){0,0,0,60});
+    if (used)
+    {
+        DrawRectangleRounded(
+           (Rectangle){x,y,57,27}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+    }
     if (Button::Inside())
     {
         if (Cur==0) MakeSound(game),Cur=1;
-        if (!used) DrawRectangle(x,y,57,27, (Color){0,0,0,60});
+        if (!used)
+        {
+            DrawRectangleRounded(
+            (Rectangle){x,y,57,27}, 
+            0.5f,
+            20,
+            (Color){0,0,0,60}
+            );
+        }
     } else
     {
         Cur=0;
@@ -262,9 +294,7 @@ void ExitButton::Input(State &game)
 {
     if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
     {
-        
-        
-        
+        MakeSound(game);
         settingbutton->used=0;
     }
 }
@@ -284,9 +314,262 @@ void ExitButton::Draw(State &game)
     if (Button::Inside())
     {
         
-        if (!used) DrawRectangle(x,y,50,50, (Color){0,0,0,60});
+        if (!used) DrawRectangleRounded(
+           (Rectangle){x,y,50,50}, 
+           0.3f,
+           20,
+           (Color){0,0,0,60}
+        );
     }
 }
+
+void ThemeOneButton::Input(State &game)
+{
+    if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
+    {
+        MakeSound(game);
+        used=1;
+        themesecondbutton->used=0;
+        game.isSound=0;
+    }
+    
+}
+void ThemeOneButton::Draw(State &game)
+{
+    DrawTextEx(game.Font,"Theme one", Vector2{x+45,y},30,3,BLACK);
+    DrawRectangleRounded(
+           (Rectangle){x,y,200,30}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+    if (used)
+    {
+        DrawTextEx(game.Font,"Theme one", Vector2{x+45+1,y+1},30,3,LIGHTGRAY);
+        DrawRectangleRounded(
+           (Rectangle){x,y,200,30}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+        
+    }
+    if (Button::Inside())
+    {
+        if (Cur==0) MakeSound(game),Cur=1;
+        if (!used)
+        {
+            DrawTextEx(game.Font,"Theme one", Vector2{x+45+1,y+1},30,3,LIGHTGRAY);
+            DrawRectangleRounded(
+            (Rectangle){x,y,200,30}, 
+            0.5f,
+            20,
+            (Color){0,0,0,60}
+            );
+        }
+    } else
+    {
+        Cur=0;
+        
+    }
+}
+
+void ThemeOneButton::keep(Button* button)
+{
+    themesecondbutton=button;
+}
+
+void ThemeSecondButton::Input(State &game)
+{
+    if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
+    {
+        MakeSound(game);
+        used=1;
+        themeonebutton->used=0;
+        game.isSound=1;
+    }
+    
+}
+void ThemeSecondButton::Draw(State &game)
+{
+    DrawTextEx(game.Font,"Theme second", Vector2{x+25,y},30,3,BLACK);
+    DrawRectangleRounded(
+           (Rectangle){x,y,200,30}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+    if (used)
+    {
+        DrawTextEx(game.Font,"Theme second", Vector2{x+25+1,y+1},30,3,LIGHTGRAY);
+        DrawRectangleRounded(
+           (Rectangle){x,y,200,30}, 
+           0.5f,
+           20,
+           (Color){0,0,0,60}
+        );
+    }
+    if (Button::Inside())
+    {
+        if (Cur==0) MakeSound(game),Cur=1;
+        if (!used)
+        {
+            DrawTextEx(game.Font,"Theme second", Vector2{x+25+1,y+1},30,3,LIGHTGRAY);
+            DrawRectangleRounded(
+            (Rectangle){x,y,200,30}, 
+            0.5f,
+            20,
+            (Color){0,0,0,60}
+            );
+        }
+    } else
+    {
+        Cur=0;
+        
+    }
+}
+
+void ThemeSecondButton::keep(Button* button)
+{
+    themeonebutton=button;
+}
+
+bool SoundButton::InsidePlus()
+{
+    Vector2 MousePos=GetMousePosition();
+    if (MousePos.x>=xP && MousePos.y>=yP && MousePos.x<=wP && MousePos.y<=hP) return 1;
+    return 0;
+}
+
+bool SoundButton::InsideMinus()
+{
+    Vector2 MousePos=GetMousePosition();
+    if (MousePos.x>=xM && MousePos.y>=yM && MousePos.x<=wM && MousePos.y<=hM) return 1;
+    return 0;
+}
+
+void SoundEffectButton::InputPlus(State &game)
+{
+    if (SoundButton::InsidePlus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (soundeffectbutton1->second<=0.9){
+            soundeffectbutton1->second+=0.1;
+            soundeffectbutton2->second+=0.1;
+        }
+        SetSoundVolume(soundeffectbutton1->first,soundeffectbutton1->second);
+        SetSoundVolume(soundeffectbutton2->first,soundeffectbutton2->second);
+    }
+}
+
+void SoundEffectButton::InputMinus(State &game) 
+{
+    if (SoundButton::InsideMinus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (soundeffectbutton1->second>=0.09){ // Sai số 0.1 -> 0.0999
+            soundeffectbutton1->second-=0.1;
+            soundeffectbutton2->second-=0.1;
+        }
+        SetSoundVolume(soundeffectbutton1->first,soundeffectbutton1->second);
+        SetSoundVolume(soundeffectbutton2->first,soundeffectbutton2->second);
+    }
+}
+
+void SoundEffectButton::Input(State &game)
+{
+    SoundEffectButton::InputMinus(game);
+    SoundEffectButton::InputPlus(game);
+}
+void SoundEffectButton::Draw(State &game)
+{
+
+    /*DrawTextEx(game.Font,"Background Music", Vector2{700,250},25,3,BLACK);
+    DrawRectangleRounded(
+        Rectangle{700+80,250+40,150,20},    
+        0.5f,
+        20,
+        WHITE
+    );
+    DrawTexture(game.MinusButton,700+50,250+40,WHITE);
+    DrawTexture(game.PlusButton,700+80+150+10,250+40,WHITE);
+    DrawTexture(game.MusicButton,700,250+35,WHITE);*/
+    DrawTextEx(game.Font,line.c_str(), Vector2{xM-50,y-40},25,3,BLACK);
+    DrawRectangleRounded(
+        Rectangle{xM+30,yM,150,20},
+        0.5f,
+        20,
+        WHITE
+    );
+   
+    DrawTexture(game.MinusButton,xM,yM,WHITE);
+    DrawTexture(game.PlusButton,xP,yP,WHITE);
+    DrawRectangleRounded(
+        Rectangle{xM+30,yM,150*soundeffectbutton1->second,20},
+        0.5f,
+        20,
+        GREEN
+    );
+    
+}
+
+void MusicButton::InputPlus(State &game)
+{
+    if (SoundButton::InsidePlus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (musicbutton1->second<=0.9){
+            musicbutton1->second+=0.1;
+            musicbutton2->second+=0.1;
+        }
+        SetMusicVolume(musicbutton1->first,musicbutton1->second);
+        SetMusicVolume(musicbutton2->first,musicbutton2->second);
+    }
+}
+
+void MusicButton::InputMinus(State &game) 
+{
+    if (SoundButton::InsideMinus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (musicbutton1->second>=0.09){ // Sai số 0.1 -> 0.0999
+            musicbutton1->second-=0.1;
+            musicbutton2->second-=0.1;
+        }
+        SetMusicVolume(musicbutton1->first,musicbutton1->second);
+        SetMusicVolume(musicbutton2->first,musicbutton2->second);
+    }
+}
+
+void MusicButton::Input(State &game)
+{
+    MusicButton::InputMinus(game);
+    MusicButton::InputPlus(game);
+}
+void MusicButton::Draw(State &game)
+{
+
+    
+    DrawTextEx(game.Font,line.c_str(), Vector2{xM-50,y-40},25,3,BLACK);
+    DrawRectangleRounded(
+        Rectangle{xM+30,yM,150,20},
+        0.5f,
+        20,
+        WHITE
+    );
+   
+    DrawTexture(game.MinusButton,xM,yM,WHITE);
+    DrawTexture(game.PlusButton,xP,yP,WHITE);
+    DrawRectangleRounded(
+        Rectangle{xM+30,yM,150*musicbutton1->second,20},
+        0.5f,
+        20,
+        GREEN
+    );
+    
+}
+
+
 void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton)
 {
     ClearBackground(RAYWHITE);
@@ -323,12 +606,26 @@ void PopUp(State &game, vector<Button*> button)
     if (game.PopUpScale<0.9f) return;
     DrawTextEx(game.Font,"Board Theme", Vector2{200,200},40,3,BLACK);
     DrawTextEx(game.Font,"Stone Style", Vector2{200,430},40,3,BLACK);
+
+    DrawTextEx(game.Font,"Sound Theme", Vector2{450,430},40,3,BLACK);
+    
+    
+    DrawTexture(game.MusicButton,700,250+35,WHITE);
+    
+    DrawTexture(game.SoundButton,700,250+35+75,WHITE);
+    
+    DrawTexture(game.SoundButton,700,250+35+75+75,WHITE);
+    
+    DrawTexture(game.SoundButton,700,250+35+75+75+75,WHITE);
+
     for (Button* a:button)
     {
         
         a->Draw(game);
         a->Input(game);
+
     }
+    
 }
 
 void DrawFast(State &game)
