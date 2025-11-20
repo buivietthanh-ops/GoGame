@@ -181,6 +181,33 @@ class MusicButton : public SoundButton
     void Draw(State &game) override;
     
 };
+
+class MuteSoundButton : public SettingButton
+{
+    private:
+    pair<Sound,float>* soundeffectbutton1;
+    pair<Sound,float>* soundeffectbutton2;
+    float oldvolume;
+    public:
+    MuteSoundButton(int x, int y, int w, int h, pair<Sound,float>* sound1, pair<Sound,float>* sound2):
+    SettingButton(x,y,w,h),soundeffectbutton1(sound1),soundeffectbutton2(sound2),oldvolume(1){};
+    void Input(State &game) override;
+    void Draw(State &game) override;
+
+};
+class MuteMusicButton : public SettingButton
+{
+    private:
+    pair<Music,float>* musicbutton1;
+    pair<Music,float>* musicbutton2;
+    float oldvolume;
+    public:
+    MuteMusicButton(int x, int y, int w, int h, pair<Music,float>* sound1, pair<Music,float>* sound2):
+    SettingButton(x,y,w,h),musicbutton1(sound1),musicbutton2(sound2),oldvolume(1){}
+    void Input(State &game) override;
+    void Draw(State &game) override;
+
+};
 void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton);
 
 void PopUp(State &game, vector<Button*> button);
@@ -188,3 +215,4 @@ void PopUp(State &game, vector<Button*> button);
 void InputOptions(State &game, Button* modebutton);
 void transition(double &a, bool &fadeOut);
 void DrawFast(State &game);
+float round1(float x);

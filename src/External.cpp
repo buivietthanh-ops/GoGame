@@ -1,6 +1,11 @@
 #include<iostream>
+#include<cmath>
 #include "include/External.h"
 
+float round1(float x)
+{
+    return roundf(x*10)/10;
+}
 void InputOptions(State &game, Button* modebutton)
 {   // -> Draw2Options
     
@@ -434,6 +439,78 @@ void ThemeSecondButton::keep(Button* button)
     themeonebutton=button;
 }
 
+void MuteSoundButton::Input(State &game)
+{
+    if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (soundeffectbutton1->second==0)
+        {
+            soundeffectbutton1->second=oldvolume;
+            soundeffectbutton2->second=oldvolume;
+        } else
+        {
+            oldvolume=soundeffectbutton1->second;
+            soundeffectbutton1->second=0;
+            soundeffectbutton2->second=0;
+        }
+        SetSoundVolume(soundeffectbutton1->first,soundeffectbutton1->second);
+        SetSoundVolume(soundeffectbutton2->first,soundeffectbutton2->second);
+    }
+}
+void MuteSoundButton::Draw(State &game)
+{
+    if (soundeffectbutton1->second==0)
+    {
+        DrawTexture(game.MuteSoundButton,x,y,WHITE);
+    } else DrawTexture(game.SoundButton,x,y,WHITE);
+    if (Button::Inside())
+    {
+        DrawRectangleRounded(
+            (Rectangle){x,y,(float)game.MuteSoundButton.width+5,(float)game.MuteSoundButton.height-3},
+            0.5f,
+            20,
+            Color{0,0,0,60}
+        );
+    }
+}
+
+void MuteMusicButton::Input(State &game)
+{
+    if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        if (musicbutton1->second==0)
+        {
+            musicbutton1->second=oldvolume;
+            musicbutton2->second=oldvolume;
+        } else
+        {
+            oldvolume=musicbutton1->second;
+            musicbutton1->second=0;
+            musicbutton2->second=0;
+        }
+        SetMusicVolume(musicbutton1->first,musicbutton1->second);
+        SetMusicVolume(musicbutton2->first,musicbutton2->second);
+    }
+}
+void MuteMusicButton::Draw(State &game)
+{
+    if (musicbutton1->second==0)
+    {
+        DrawTexture(game.MuteMusicButton,x,y,WHITE);
+    } else DrawTexture(game.MusicButton,x,y,WHITE);
+    if (Button::Inside())
+    {
+        DrawRectangleRounded(
+            (Rectangle){x,y,(float)game.MuteMusicButton.width+5,(float)game.MuteMusicButton.height+2},
+            0.5f,
+            20,
+            Color{0,0,0,60}
+        );
+    }
+}
+
 bool SoundButton::InsidePlus()
 {
     Vector2 MousePos=GetMousePosition();
@@ -456,6 +533,9 @@ void SoundEffectButton::InputPlus(State &game)
         if (soundeffectbutton1->second<=0.9){
             soundeffectbutton1->second+=0.1;
             soundeffectbutton2->second+=0.1;
+
+            soundeffectbutton1->second=round1(soundeffectbutton1->second);
+            soundeffectbutton2->second=round1(soundeffectbutton2->second);
         }
         SetSoundVolume(soundeffectbutton1->first,soundeffectbutton1->second);
         SetSoundVolume(soundeffectbutton2->first,soundeffectbutton2->second);
@@ -467,9 +547,11 @@ void SoundEffectButton::InputMinus(State &game)
     if (SoundButton::InsideMinus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         MakeSound(game);
-        if (soundeffectbutton1->second>=0.09){ // Sai số 0.1 -> 0.0999
+        if (soundeffectbutton1->second>=0.1){ 
             soundeffectbutton1->second-=0.1;
             soundeffectbutton2->second-=0.1;
+            soundeffectbutton1->second=round1(soundeffectbutton1->second);
+            soundeffectbutton2->second=round1(soundeffectbutton2->second);
         }
         SetSoundVolume(soundeffectbutton1->first,soundeffectbutton1->second);
         SetSoundVolume(soundeffectbutton2->first,soundeffectbutton2->second);
@@ -484,16 +566,7 @@ void SoundEffectButton::Input(State &game)
 void SoundEffectButton::Draw(State &game)
 {
 
-    /*DrawTextEx(game.Font,"Background Music", Vector2{700,250},25,3,BLACK);
-    DrawRectangleRounded(
-        Rectangle{700+80,250+40,150,20},    
-        0.5f,
-        20,
-        WHITE
-    );
-    DrawTexture(game.MinusButton,700+50,250+40,WHITE);
-    DrawTexture(game.PlusButton,700+80+150+10,250+40,WHITE);
-    DrawTexture(game.MusicButton,700,250+35,WHITE);*/
+    
     DrawTextEx(game.Font,line.c_str(), Vector2{xM-50,y-40},25,3,BLACK);
     DrawRectangleRounded(
         Rectangle{xM+30,yM,150,20},
@@ -521,6 +594,9 @@ void MusicButton::InputPlus(State &game)
         if (musicbutton1->second<=0.9){
             musicbutton1->second+=0.1;
             musicbutton2->second+=0.1;
+
+            musicbutton1->second=round1(musicbutton1->second);
+            musicbutton2->second=round1(musicbutton2->second);
         }
         SetMusicVolume(musicbutton1->first,musicbutton1->second);
         SetMusicVolume(musicbutton2->first,musicbutton2->second);
@@ -532,9 +608,12 @@ void MusicButton::InputMinus(State &game)
     if (SoundButton::InsideMinus() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         MakeSound(game);
-        if (musicbutton1->second>=0.09){ // Sai số 0.1 -> 0.0999
+        if (musicbutton1->second>=0.1){ 
             musicbutton1->second-=0.1;
             musicbutton2->second-=0.1;
+            
+            musicbutton1->second=round1(musicbutton1->second);
+            musicbutton2->second=round1(musicbutton2->second);
         }
         SetMusicVolume(musicbutton1->first,musicbutton1->second);
         SetMusicVolume(musicbutton2->first,musicbutton2->second);
@@ -610,13 +689,7 @@ void PopUp(State &game, vector<Button*> button)
     DrawTextEx(game.Font,"Sound Theme", Vector2{450,430},40,3,BLACK);
     
     
-    DrawTexture(game.MusicButton,700,250+35,WHITE);
     
-    DrawTexture(game.SoundButton,700,250+35+75,WHITE);
-    
-    DrawTexture(game.SoundButton,700,250+35+75+75,WHITE);
-    
-    DrawTexture(game.SoundButton,700,250+35+75+75+75,WHITE);
 
     for (Button* a:button)
     {

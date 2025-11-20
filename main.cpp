@@ -69,6 +69,18 @@ int main () {
         700+50,250+40,700+50+21,250+40+21,
         &game.music[0], &game.music[1],line);
 
+    Button* muteplacingstonebutton= new MuteSoundButton(700,250+35+75,700+game.MuteSoundButton.width,250+35+75+game.MuteSoundButton.height,
+    &game.sound[0].Click, &game.sound[1].Click);
+
+    Button* mutecapturestonebutton= new MuteSoundButton(700,250+35+75*2,700+game.MuteSoundButton.width,250+35+75*2+game.MuteSoundButton.height,
+    &game.sound[0].Getscore, &game.sound[1].Getscore);
+
+    Button* muteendgamebutton= new MuteSoundButton(700,250+35+75*3,700+game.MuteSoundButton.width,250+35+75*3+game.MuteSoundButton.height,
+    &game.sound[0].Endgame, &game.sound[1].Endgame);
+
+    Button* mutemusicbutton= new MuteMusicButton(700,250+35,700+game.MuteMusicButton.width,250+35+game.MuteMusicButton.height,
+    &game.music[0], &game.music[1]);
+    
     Player* player1 = new Player();
     Player* player2 = new Player();
 
@@ -84,7 +96,10 @@ int main () {
     button.push_back(capturestonebutton);
     button.push_back(endgamebutton);
     button.push_back(backgroundmusic);
-
+    button.push_back(muteplacingstonebutton);
+    button.push_back(mutecapturestonebutton);
+    button.push_back(muteendgamebutton);
+    button.push_back(mutemusicbutton);
     while (WindowShouldClose() == false){
 
         UpdateMusicStream(game.music[game.isSound].first);
