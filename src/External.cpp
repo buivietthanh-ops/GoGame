@@ -1,38 +1,10 @@
-#include<iostream>
-#include<cmath>
 #include "include/External.h"
 
 float round1(float x)
 {
     return roundf(x*10)/10;
 }
-void InputOptions(State &game, Button* modebutton)
-{   // -> Draw2Options
-    
-     Vector2 mousePos=GetMousePosition();
-    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=200 && mousePos.y<=325)
-    {
-        if (game.curPlayers==0) MakeSound(game),game.curPlayers=1;
-        DrawTexture(game.TwoPlayers,469-30,200-30,WHITE);
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            game.mode=1;
-            modebutton->used=0;
-        }
 
-    } else game.curPlayers=0;
-    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=471 && mousePos.y<=600)
-    {
-        if (game.curComputer==0) MakeSound(game),game.curComputer=1;
-        DrawTexture(game.Computer,469-30,471-30,WHITE);
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            game.mode=2;
-            modebutton->used=0;
-        }
-    } else game.curComputer=0;
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) MakeSound(game);
-}
 void transition(double &a, bool &fadeOut)
 {
     if (fadeOut)
@@ -48,7 +20,37 @@ void transition(double &a, bool &fadeOut)
 }
 
 
+void TwoOptions:: Input_Draw(State &game, Button* modebutton)
+{
+    if (!isFirstTime)
+    {
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)==0)
+        {
+            isFirstTime=1;
+        }
+        return;
+    }
+    if (GuiWindowBox(Rectangle{600-800/2,400-500/2,800,500},"Mode"))
+    {
+        isFirstTime=0;
+        modebutton->used=0;
+        return;
+    }
 
+    if (GuiButton(Rectangle{450,320,300,60},"Two Players"))
+    {
+        isFirstTime=0;
+        game.mode=1;
+        modebutton->used=0;
+    }
+
+    if (GuiButton(Rectangle{450,420,300,60},"Computer"))
+    {
+        isFirstTime=0;
+        game.mode=2;
+        modebutton->used=0;
+    }
+}
 
 
 bool Button::Inside()
@@ -145,7 +147,7 @@ void BoardThemeButton::Draw(State &game)
     DrawTexturePro(
             game.Board,
             Rectangle{0,0,(float)game.Board.width,(float)game.Board.height},
-            Rectangle{(float)x,(float)y,120*2,80*2},
+            Rectangle{x,y,120*2,80*2},
             Vector2{0,0},
             0.0f,
             WHITE
@@ -161,6 +163,7 @@ void BoardThemeButton::Draw(State &game)
         Cur=0;
         
     }
+    DrawTextEx(game.Font,"Board Theme", Vector2{200,200},40,3,BLACK);
 };
 void BoardThemeButton::keep(Button* button)
 {
@@ -243,6 +246,7 @@ void StoneButton::Draw(State &game)
         Cur=0;
         
     }
+    DrawTextEx(game.Font,"Stone Style", Vector2{200,430},40,3,BLACK);
 }
 void StoneButton::keep(Button* button)
 {
@@ -301,6 +305,7 @@ void ExitButton::Input(State &game)
     {
         MakeSound(game);
         settingbutton->used=0;
+        game.PopUpScale=0;
     }
 }
 
@@ -509,6 +514,7 @@ void MuteMusicButton::Draw(State &game)
             Color{0,0,0,60}
         );
     }
+    DrawTextEx(game.Font,"Sound Theme", Vector2{450,430},40,3,BLACK);
 }
 
 bool SoundButton::InsidePlus()
@@ -648,8 +654,18 @@ void MusicButton::Draw(State &game)
     
 }
 
+bool CloseGameButton::Input_Draw()
+{
+    if (GuiButton(Rectangle{20,20,250,30},"Quit Game"))
+    {
+        return 1;
+    }
+    return 0;
+}
 
-void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton)
+
+
+void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton, CloseGameButton* closegamebutton)
 {
     ClearBackground(RAYWHITE);
     DrawTexture(game.External,0,0,WHITE);
@@ -659,6 +675,7 @@ void External(State &game, Button* startbutton, Button* modebutton, Button* sett
         a->Draw(game);
         a->Input(game);
     }
+    game.isClose=closegamebutton->Input_Draw();
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200,100},100,10,LIGHTGRAY); 
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200-3,100-3},100,10,BLACK); 
     DrawTextEx(game.Font,"Choose mode first!",Vector2{800,30},30,10,BLACK);
@@ -683,10 +700,7 @@ void PopUp(State &game, vector<Button*> button)
     );
     
     if (game.PopUpScale<0.9f) return;
-    DrawTextEx(game.Font,"Board Theme", Vector2{200,200},40,3,BLACK);
-    DrawTextEx(game.Font,"Stone Style", Vector2{200,430},40,3,BLACK);
-
-    DrawTextEx(game.Font,"Sound Theme", Vector2{450,430},40,3,BLACK);
+    
     
     
     

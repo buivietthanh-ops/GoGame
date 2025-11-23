@@ -1,6 +1,7 @@
 #pragma once
 #include<raylib.h>
 #include<vector>
+#include<string>
 using namespace std;
 struct position
 {
@@ -12,17 +13,19 @@ struct StateSound
 };
 struct State
 {
-    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic,isSound;
+    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic,isSound, isClose;
     double PopUpScale;
     Texture2D Board,ButtonStart,External,ButtonStartFade,TwoOptions,TwoPlayers,Computer,InvalidOption
     ,ModernBoard,SettingBackground,PlayBoard,ExitButton,BlackStone,WhiteStone,MinusButton,PlusButton
-    ,MusicButton,MuteMusicButton,SoundButton,MuteSoundButton;
-    vector<vector<vector<int>>> SaveBoard;
+    ,MusicButton,MuteMusicButton,SoundButton,MuteSoundButton,PassButton,GameOver;
+    vector<vector<vector<int>>> SaveBoard,Redo;
+    vector<string> filelist;
     StateSound sound[2];
     pair<Music,float> music[2];
     Font Font;
     State()
     {
+        isClose=0;
         for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) board[x][y]=0;
         size=19;
         outside=400;
@@ -33,6 +36,8 @@ struct State
         curPlayers=0;
         curComputer=0;
         PopUpScale=0.0f;
+
+
         Board=LoadTexture("assets/Board.png");
         ButtonStart=LoadTexture("assets/ButtonStart.png");
         External=LoadTexture("assets/External.png");
@@ -46,6 +51,7 @@ struct State
         sound[0].Getscore={LoadSound("assets/GetScore.wav"),1}; // SOUND
         sound[1].Getscore={LoadSound("assets/GetScore2.wav"),1};
         sound[0].Endgame={LoadSound("assets/EndGame.wav"),1};
+        sound[1].Endgame={LoadSound("assets/EndGame1.wav"),1};
         music[0]={LoadMusicStream("assets/BackgroundMusic.mp3"),1};
         music[1]={LoadMusicStream("assets/BackgroundMusic2.mp3"),1};
         isSound=0;
@@ -71,5 +77,16 @@ struct State
         MuteMusicButton=LoadTexture("assets/MuteMusicButton.png");
         SoundButton=LoadTexture("assets/SoundButton.png");
         MuteSoundButton=LoadTexture("assets/MuteSoundButton.png");
+        
+
+
+        PassButton=LoadTexture("assets/PassButton.png");
+        GameOver=LoadTexture("assets/GameOver.png");
+
+        vector<vector<int>> board (23, vector<int>(23,0));
+        SaveBoard.push_back(board);
+        Redo.push_back(board);
+
+        
     }
 };

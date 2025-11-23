@@ -1,6 +1,5 @@
 #include "include/BoardRender.h"
-#include <iostream>
-#include <random>
+
 
 
 
@@ -35,10 +34,22 @@ void DrawBoard(State &game)
     }
     if (game.PlayerPos==1)
     {
-        
+        DrawRectangleRounded(
+            (Rectangle){100,75,230,60},
+            0.5f,
+            20,
+            (Color){255,255,255,80}
+        );
+        DrawTextEx(game.Font,"Black Turn",(Vector2){100,75},60,2,BLACK);
         DrawTextEx(game.Font,"Black Turn",(Vector2){100,75},60,2,BLACK);
     } else 
     {
+        DrawRectangleRounded(
+            (Rectangle){100,75,230,60},
+            0.5f,
+            20,
+            (Color){0,0,0,80}
+        );
         DrawTextEx(game.Font,"White Turn",(Vector2){100,75},60,2,WHITE);
     }
 }

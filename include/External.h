@@ -1,6 +1,7 @@
 #pragma once
 #include "include/Game.h"
 #include "include/interaction.h"
+#include<cmath>
 
 
 class Button {
@@ -28,6 +29,8 @@ class StartButton : public Button
     void Draw(State &game) override;
 
 };
+
+
 class ModeButton : public Button
 {
     private:
@@ -39,6 +42,15 @@ class ModeButton : public Button
     void Draw(State &game) override;
 
 };
+
+class TwoOptions : public ModeButton
+{
+    public:
+    bool isFirstTime;
+    TwoOptions() : ModeButton(0,0,0,0),isFirstTime(0){}
+    void Input_Draw(State &game, Button* modebutton);
+};
+
 class SettingButton : public Button
 {
     private:
@@ -208,11 +220,20 @@ class MuteMusicButton : public SettingButton
     void Draw(State &game) override;
 
 };
-void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton);
+
+class CloseGameButton : public Button
+{
+    public:
+    CloseGameButton() : Button(0,0,0,0){}
+    bool Input_Draw();
+};
+
+
+void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton, CloseGameButton* closegamebutton);
 
 void PopUp(State &game, vector<Button*> button);
 
-void InputOptions(State &game, Button* modebutton);
+
 void transition(double &a, bool &fadeOut);
 void DrawFast(State &game);
 float round1(float x);

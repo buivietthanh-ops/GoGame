@@ -1,6 +1,4 @@
 #include "include/GameLogic.h"
-#include <iostream>
-#include <queue>
 using namespace std;
 int ck[23][23];
 int ud[]={0,0,-1,1};
@@ -49,7 +47,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
         }
     }
     if (contain.size()>0) getscore=1;
-    if (ktr[game.PlayerPos]==0)
+    if (ktr[game.PlayerPos]==0) // No suicide
     {
         for (pair<int,int> pos:contain)
         {
@@ -57,7 +55,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
         }
         return;
     }
-    if (ktr[game.PlayerPos]==1 && ktr[(game.PlayerPos==1?2:1)]==0)
+    if (ktr[game.PlayerPos]==1 && ktr[(game.PlayerPos==1?2:1)]==0) // Suicide but not get score
     {
         invalid=1;
         return;
@@ -75,10 +73,58 @@ void CaptureStone(State &game, int &invalid, int &getscore)
             if (game.board[i][j]!=game.SaveBoard[game.SaveBoard.size()-2][i][j]) dif=1;
         }
     }
-    if (!dif)
+
+    if (!dif) // Ko threats
     {
-        invalid=1;
+        invalid=2;
 
         return;
+    }
+}
+
+void CountScore(State &game, int &player1, int &player2)
+{
+    for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) ck[x][y]=0;
+    for (int x=1;x<=19;x++) for (int y=1;y<=19;y++)
+    {
+        if (game.board[x][y]==1) player1++;
+        if (game.board[x][y]==2) player2++;
+    }
+    vector<pair<int,int>> contain;
+    for (int x_cur=1;x_cur<=19;x_cur++)
+    {
+        for (int y_cur=1;y_cur<=19;y_cur++)
+        {
+            if (game.board[x_cur][y_cur]==0 && ck[x_cur][y_cur]==0)
+            {
+                bool isBlack=0,isWhite=0;
+                int cnt=0;
+                queue <pair<int,int>> q;
+                
+                q.push({x_cur,y_cur});
+                ck[x_cur][y_cur]=1;
+                
+                while(q.size())
+                {
+                    pair<int,int> pos=q.front();
+                    q.pop();
+                    cnt++;
+                    for (int i=0;i<4;i++)
+                    {
+                        int x=pos.first+ud[i], y=pos.second+lr[i];
+                        if (x>=1 && x<=19 && y>=1 && y<=19)
+                        {
+                            if (game.board[x][y]==0 && ck[x][y]==0) q.push({x,y}),ck[x][y]=1;
+
+                            if (game.board[x][y]==1) isBlack=1;
+                            if (game.board[x][y]==2) isWhite=1;
+                        }
+                    }
+                }
+                if (isBlack && isWhite) continue;
+                if (isBlack) player1+=cnt;
+                if (isWhite) player2+=cnt;
+            }
+        }
     }
 }

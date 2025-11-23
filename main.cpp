@@ -1,10 +1,13 @@
 #include <iostream>
 #include <raylib.h>
 #include <vector>
+#include "json.hpp"
 #include "include/interaction.h"
 #include "include/BoardRender.h"
 #include "include/Game.h"
 #include "include/External.h"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 using namespace std;
 
 
@@ -21,7 +24,8 @@ int main () {
     // 0 -> stay    [1 -> Build board    2 -> Play game] (Option)
     // 0 -> No      1-> 2 players       2-> AI (Mode)
     // option 4 -> setting
-    int time=0,used=0,dem=0;
+    bool isOver=0;
+    int time=0,used=0,dem=0,score[2]={0,0};
     bool fadeOut=0;
     double a=0;
     int x=rand()%(1200-500),y=rand()%(800-300);
@@ -100,15 +104,47 @@ int main () {
     button.push_back(mutecapturestonebutton);
     button.push_back(muteendgamebutton);
     button.push_back(mutemusicbutton);
+    line="Pass";
+    InsideButton* passbutton= new PassButton(100,200,100+game.PassButton.width,200+game.PassButton.height,line);
+
+    line="Undo";
+    InsideButton* undobutton= new UndoButton(100,300,100+game.PassButton.width,300+game.PassButton.height,line);
+    
+    line="Redo";
+    InsideButton* redobutton= new RedoButton(100,400,100+game.PassButton.width,400+game.PassButton.height,line);
+
+    line="Reset";
+    InsideButton* resetbutton= new ResetButton(100,500,100+game.PassButton.width,500+game.PassButton.height,line);
+
+    line="Save";
+    InsideButton* savebutton= new SaveButton(100,600,100+game.PassButton.width,600+game.PassButton.height,line);
+
+    line="Load";
+    InsideButton* loadbutton= new LoadButton(100,700,100+game.PassButton.width,700+game.PassButton.height,line);
+
+    QuitButton* quitbutton= new QuitButton();
+
+    CloseGameButton* closegamebutton= new CloseGameButton();
+
+    TwoOptions* twooptions= new TwoOptions();
+    vector<InsideButton*> insidebutton;
+    insidebutton.push_back(passbutton);
+    insidebutton.push_back(undobutton);
+    insidebutton.push_back(redobutton);
+    insidebutton.push_back(resetbutton);
+    insidebutton.push_back(savebutton);
+    insidebutton.push_back(loadbutton);
+
     while (WindowShouldClose() == false){
 
         UpdateMusicStream(game.music[game.isSound].first);
         
         BeginDrawing();
+        GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
         if (game.option==0)
         {
             
-        
+            //cout<<startbutton->used<<' '<<modebutton->used<<' '<<settingbutton->used<<endl;
             if (startbutton->used==1)
             {
                 if (game.mode==0)
@@ -134,17 +170,17 @@ int main () {
                     if (fadeOut==0) fadeOut=1;
                     transition(a,fadeOut);
                     if (dem==50)
-                    game.option=1;
+                    {
+                        game.option=1,startbutton->used=0,dem=0,a=0;
+                    }
                 }
-                
             }
             
             else
             if (modebutton->used==1)
             {
                 
-                Draw2Options(game);
-                InputOptions(game,modebutton);
+                twooptions->Input_Draw(game,modebutton);
  
             }
 
@@ -156,30 +192,36 @@ int main () {
             }
 
             else
-            External(game,startbutton,modebutton,settingbutton);
+            External(game,startbutton,modebutton,settingbutton, closegamebutton);
         }
          else
         {
             int invalid=0;
             DrawBoard(game);
-            if (game.PlayerPos==1)
-            player1->InputStone(game,invalid); else player2->InputStone(game, invalid);
+
             
-            if (invalid)
+            if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0)
             {
-                time=GetTime();
-                used=1;
-            }
-            if (used==1){
-                if (GetTime()-time>=1)
-                {
-                    time=0;
-                    used=0;
-                } else DrawTextEx(game.Font,"Invalid!",(Vector2){500,300},100,5,LIGHTGRAY),DrawTextEx(game.Font,"Invalid!",(Vector2){503,303},100,5,BLACK);
+                quitbutton->Input_Draw(game);
+                if (game.PlayerPos==1)
+                player1->InputStone(game,invalid); else player2->InputStone(game, invalid);
             }
             
+
+
+            for (InsideButton* a:insidebutton) 
+            {
+                if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0) a->Input(game);
+                a->Draw(game);
+            }
+            savebutton->SaveDraw(game);
+            loadbutton->LoadDraw(game);
+            isValid(game,invalid,used,time,line);
+            
+            GameOver(game,isOver,score);
         }
         EndDrawing();
+        if (game.isClose) break;
     }
     UnloadMusicStream(game.music[0].first);
     UnloadMusicStream(game.music[1].first);
