@@ -20,6 +20,34 @@ void transition(double &a, bool &fadeOut)
 }
 
 
+/*void InputOptions(State &game, Button* modebutton)
+{   // -> Draw2Options
+    
+     Vector2 mousePos=GetMousePosition();
+    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=200 && mousePos.y<=325)
+    {
+        if (game.curPlayers==0) MakeSound(game),game.curPlayers=1;
+        DrawTexture(game.TwoPlayers,469-30,200-30,WHITE);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            game.mode=1;
+            modebutton->used=0;
+        }
+
+    } else game.curPlayers=0;
+    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=471 && mousePos.y<=600)
+    {
+        if (game.curComputer==0) MakeSound(game),game.curComputer=1;
+        DrawTexture(game.Computer,469-30,471-30,WHITE);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            game.mode=2;
+            modebutton->used=0;
+        }
+    } else game.curComputer=0;
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) MakeSound(game);
+}*/
+
 void TwoOptions:: Input_Draw(State &game, Button* modebutton)
 {
     if (!isFirstTime)

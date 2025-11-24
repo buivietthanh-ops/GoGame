@@ -57,8 +57,8 @@ void DrawInvalidOption(State &game, int x, int y)
 {
     DrawTexture(game.InvalidOption,x,y,WHITE);
 }
-void Draw2Options(State &game)
+/*void Draw2Options(State &game)
 {
     DrawTexture(game.TwoOptions,600-270,400-270,WHITE);
     // -> InputOptions
-}
+}*/

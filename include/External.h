@@ -233,7 +233,7 @@ void External(State &game, Button* startbutton, Button* modebutton, Button* sett
 
 void PopUp(State &game, vector<Button*> button);
 
-
+//void InputOptions(State &game, Button* modebutton);
 void transition(double &a, bool &fadeOut);
 void DrawFast(State &game);
 float round1(float x);

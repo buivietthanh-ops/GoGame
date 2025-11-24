@@ -124,6 +124,9 @@ int main () {
 
     QuitButton* quitbutton= new QuitButton();
 
+    line="Play Again";
+    InsideButton* playagain= new ResetButton(500,600,500+game.PassButton.width,600+game.PassButton.height,line);
+
     CloseGameButton* closegamebutton= new CloseGameButton();
 
     TwoOptions* twooptions= new TwoOptions();
@@ -179,9 +182,10 @@ int main () {
             else
             if (modebutton->used==1)
             {
-                
+                //Draw2Options(game);
+                //InputOptions(game,modebutton);
                 twooptions->Input_Draw(game,modebutton);
- 
+                
             }
 
             else
@@ -218,7 +222,7 @@ int main () {
             loadbutton->LoadDraw(game);
             isValid(game,invalid,used,time,line);
             
-            GameOver(game,isOver,score);
+            GameOver(game,isOver,score, playagain);
         }
         EndDrawing();
         if (game.isClose) break;

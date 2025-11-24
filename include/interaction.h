@@ -101,5 +101,5 @@ class QuitButton : public InsideButton
 void MakeSound(State &game);
 void MakeSoundGetScore(State &game);
 void isValid(State &game, int &invalid, int &used, int &time, string &line);
-void GameOver(State &game, bool &isOver, int score[]);
+void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain);
 

@@ -143,8 +143,9 @@ void InsideButton::LoadGame(State &game, string filename){}
 bool InsideButton::isUsing(){}
 void InsideButton::Draw(State &game)
 {
-    int c=0;
+    int c=0,k=0;
     if (line=="Reset") c=8;
+    if (line=="Play Again") c=47,k=5;
     if (InsideButton::Inside())
     {
         DrawTexturePro(
@@ -155,12 +156,12 @@ void InsideButton::Draw(State &game)
             0.0f,
             WHITE
         );
-        DrawTextEx(game.Font,line.c_str(),Vector2{x+63-c,y+8},45,3,BLACK);
+        DrawTextEx(game.Font,line.c_str(),Vector2{x+63-c,y+8},45-k,3,BLACK);
         return;
     } else
     {
         DrawTexture(game.PassButton,x,y,WHITE);
-        DrawTextEx(game.Font,line.c_str(),Vector2{x+65-c,y+10},40,3,BLACK);
+        DrawTextEx(game.Font,line.c_str(),Vector2{x+65-c,y+10},40-k,3,BLACK);
     }
 }
 
@@ -377,7 +378,7 @@ void QuitButton::Input_Draw(State &game)
         game.option=0;
     }
 }
-void GameOver(State &game, bool &isOver, int score[])
+void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain)
 {
     if (game.SaveBoard.size()>=3)
     {
@@ -441,6 +442,14 @@ void GameOver(State &game, bool &isOver, int score[])
             player2="WHITE: "+player2;
             DrawTextEx(game.Font,player1.c_str(),Vector2{600-230,400-220+200},50,3,BLACK);
             DrawTextEx(game.Font,player2.c_str(),Vector2{600-230,400-220+300},50,3,BLACK);
+
+            playagain->Input(game);
+            playagain->Draw(game);
+            if (game.SaveBoard.size()==1)
+            {
+                isOver=0;
+                score[0]=score[1]=0;
+            }
 
             
             
