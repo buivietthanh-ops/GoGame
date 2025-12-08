@@ -13,11 +13,16 @@ struct StateSound
 };
 struct State
 {
-    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic,isSound, isClose;
+    int board[23][23],size,cell_sz,PlayerPos,outside,option,mode,curPlayers,curComputer,isClassic,isSound, isClose,level,InfluenceMap[23][23],HeuristicMap[23][23];
     double PopUpScale;
+    pair<int,int> AIMove;
+
+
+    int dem; // for checking complexity
+
     Texture2D Board,ButtonStart,External,ButtonStartFade,TwoOptions,TwoPlayers,Computer,InvalidOption
     ,ModernBoard,SettingBackground,PlayBoard,ExitButton,BlackStone,WhiteStone,MinusButton,PlusButton
-    ,MusicButton,MuteMusicButton,SoundButton,MuteSoundButton,PassButton,GameOver;
+    ,MusicButton,MuteMusicButton,SoundButton,MuteSoundButton,PassButton,GameOver,LeftButton,RightButton;
     vector<vector<vector<int>>> SaveBoard,Redo;
     vector<string> filelist;
     StateSound sound[2];
@@ -25,8 +30,9 @@ struct State
     Font Font;
     State()
     {
+        dem=0;
         isClose=0;
-        for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) board[x][y]=0;
+        for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) board[x][y]=InfluenceMap[x][y]=HeuristicMap[x][y]=0;
         size=19;
         outside=400;
         cell_sz=40;
@@ -36,7 +42,7 @@ struct State
         curPlayers=0;
         curComputer=0;
         PopUpScale=0.0f;
-
+        level=1;
 
         Board=LoadTexture("assets/Board.png");
         ButtonStart=LoadTexture("assets/ButtonStart.png");
@@ -45,6 +51,8 @@ struct State
         TwoOptions=LoadTexture("assets/TwoOptions.png");
         TwoPlayers=LoadTexture("assets/TwoPlayers.png");
         Computer=LoadTexture("assets/Computer.png");
+        LeftButton=LoadTexture("assets/LeftButton.png");
+        RightButton=LoadTexture("assets/RightButton.png");
 
         sound[0].Click={LoadSound("assets/Click.wav"),1};
         sound[1].Click={LoadSound("assets/Click2.wav"),1};

@@ -228,6 +228,16 @@ class CloseGameButton : public Button
     bool Input_Draw();
 };
 
+class LevelButton : public Button
+{
+    public:
+    int level;
+    Texture2D image;
+    LevelButton(int x, int y, int w, int h, int level1, Texture2D image1) : Button(x,y,w,h),level(level1),image(image1){}
+    
+    void Input(State &game) override;
+    void Draw(State &game) override;
+};
 
 void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton, CloseGameButton* closegamebutton);
 

@@ -691,6 +691,29 @@ bool CloseGameButton::Input_Draw()
     return 0;
 }
 
+void LevelButton::Input(State &game)
+{
+    if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        MakeSound(game);
+        game.level+=level;
+        if (game.level>3) game.level=1;
+        if (game.level<1) game.level=3;
+    }
+}
+void LevelButton::Draw(State &game)
+{
+    string line;
+    if (game.level==1) line="Easy";
+    if (game.level==2) line="Medium";
+    if (game.level==3) line="Hard";
+    float c=0;
+    if (line=="Medium") c=-10;
+    DrawTextEx(game.Font,line.c_str(),Vector2{567+c,502},35,3,GREEN);
+    DrawTextEx(game.Font,line.c_str(),Vector2{568+c,503},35,3,LIGHTGRAY);
+    DrawTextEx(game.Font,line.c_str(),Vector2{569+c,500},35,3,BLACK);
+    DrawTexture(image,x,y,WHITE);
+}
 
 
 void External(State &game, Button* startbutton, Button* modebutton, Button* settingbutton, CloseGameButton* closegamebutton)

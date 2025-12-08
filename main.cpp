@@ -6,6 +6,7 @@
 #include "include/BoardRender.h"
 #include "include/Game.h"
 #include "include/External.h"
+#include "include/AI.h"
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 using namespace std;
@@ -88,6 +89,14 @@ int main () {
     Player* player1 = new Player();
     Player* player2 = new Player();
 
+
+
+
+    // mode
+    Button* leftbutton= new LevelButton(400,500,435,535,-1,game.LeftButton);
+    Button* rightbutton= new LevelButton(770,500,805,535,1,game.RightButton);
+
+
     vector<Button*> button;
     button.push_back(boardthemebutton);
     button.push_back(modernboardbutton);
@@ -144,6 +153,9 @@ int main () {
         
         BeginDrawing();
         GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+        GuiSetFont(game.Font);
+
+        
         if (game.option==0)
         {
             
@@ -185,7 +197,12 @@ int main () {
                 //Draw2Options(game);
                 //InputOptions(game,modebutton);
                 twooptions->Input_Draw(game,modebutton);
-                
+                if (twooptions->isFirstTime){
+                    leftbutton->Input(game);
+                    leftbutton->Draw(game);
+                    rightbutton->Input(game);
+                    rightbutton->Draw(game);
+                }
             }
 
             else
@@ -203,13 +220,21 @@ int main () {
             int invalid=0;
             DrawBoard(game);
 
-            
+            game.dem=0;
             if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0)
             {
                 quitbutton->Input_Draw(game);
                 if (game.PlayerPos==1)
-                player1->InputStone(game,invalid); else player2->InputStone(game, invalid);
+                {
+                    player1->InputStone(game,invalid);
+                } else 
+                {
+                    if (game.mode==2) AI(game);
+                    player2->InputStone(game, invalid);
+                    cout<<game.dem<<endl;
+                }
             }
+            
             
 
 
@@ -224,6 +249,7 @@ int main () {
             
             GameOver(game,isOver,score, playagain);
         }
+        //cout<<game.mode<<' '<<game.level<<endl;
         EndDrawing();
         if (game.isClose) break;
     }

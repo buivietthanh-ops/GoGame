@@ -62,7 +62,44 @@ position real_pos(Vector2 mousePos, int cell_sz)
 }
 void Player::InputStone(State &game, int &invalid)
 {
+
+    // AI
+
     vector<vector<int>> board (23, vector<int>(23,0));
+
+    if (game.mode==2 && game.PlayerPos==2)
+    {
+        MakeSound(game);
+            
+        game.board[game.AIMove.first][game.AIMove.second]=2;
+                
+        int getscore=0;
+        CaptureStone(game,invalid,getscore); // 100% legal move
+                
+        game.PlayerPos=1;
+        for (int x=1;x<=19;x++) 
+        {
+            for (int y=1;y<=19;y++)
+            {
+                board[x][y]=game.board[x][y];
+            }
+        }
+        game.SaveBoard.push_back(board);
+        if (getscore) 
+        {
+            MakeSoundGetScore(game);
+            invalid=3;
+        }
+        game.Redo.clear();
+
+        return;
+                
+    }
+
+
+
+
+    
 
     Vector2 mousePos = GetMousePosition();
 

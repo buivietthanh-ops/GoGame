@@ -14,6 +14,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
     {
         for (int y_cur=1;y_cur<=19;y_cur++)
         {
+            game.dem++;
             if (game.board[x_cur][y_cur] && ck[x_cur][y_cur]==0)
             {
                 int cnt=0;
@@ -24,6 +25,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
                 
                 while(q.size())
                 {
+                    game.dem++;
                     pair<int,int> pos=q.front();
                     q.pop();
                     d.push_back(pos);
