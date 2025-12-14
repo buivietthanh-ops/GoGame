@@ -1,8 +1,6 @@
 #include "include/BoardRender.h"
 
 
-
-
 void DrawBoard(State &game)
 {
     ClearBackground(RAYWHITE);

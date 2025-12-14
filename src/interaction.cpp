@@ -314,6 +314,7 @@ void ResetButton::Warning(State &game)
 
 void SaveButton::SaveGame(State &game, char filename[])
 {
+    
     json j;
 
     j["SaveBoard"]=game.SaveBoard;

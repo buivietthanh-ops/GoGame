@@ -786,7 +786,10 @@ void DrawFast(State &game)
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200,100},100,10,LIGHTGRAY); 
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200-3,100-3},100,10,BLACK); 
     DrawTextEx(game.Font,"Choose mode first!",Vector2{800,30},30,10,BLACK);
-    CloseGameButton* closegamebutton= new CloseGameButton();
-    game.isClose=closegamebutton->Input_Draw();
+    
+    if (GuiButton(Rectangle{20,20,250,30},"Quit Game"))
+    {
+        
+    }
 
 }

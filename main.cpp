@@ -147,6 +147,7 @@ int main () {
 
     future<pair<int,int>>  futureAI;
     bool isAIRunning=0;
+    filesystem::create_directory("save");
     while (WindowShouldClose() == false){
 
         UpdateMusicStream(game.music[game.isSound].first);
@@ -251,7 +252,7 @@ int main () {
             }
             
 
-            for (InsideButton* a:insidebutton) 
+            for (InsideButton* a:insidebutton)
             {
                 if (!isOver && !isAIRunning && savebutton->isUsing()==0 && loadbutton->isUsing()==0 && resetbutton->isUsing()==0) a->Input(game);
                 a->Draw(game);
@@ -273,4 +274,5 @@ int main () {
 
     CloseAudioDevice();
     CloseWindow();
+    return 0;
 }

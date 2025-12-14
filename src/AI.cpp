@@ -13,15 +13,8 @@ int group[23][23], sz[403];
 
 int type_stone[]={0,-5,-1,1,10,5};
 
-
-
-
-
 int score_connect=0;
 pair<int,int> OptimalMove;
-
-
-
 
 struct ff
 {
