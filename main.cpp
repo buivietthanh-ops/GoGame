@@ -1,5 +1,6 @@
 #include <iostream>
 #include <raylib.h>
+#include <future>
 #include <vector>
 #include "json.hpp"
 #include "include/interaction.h"
@@ -20,16 +21,15 @@ int main () {
     SetTargetFPS(60);
     InitAudioDevice();
     State game;
+    game.Build();
     PlayMusicStream(game.music[0].first);
     PlayMusicStream(game.music[1].first);
-    // 0 -> stay    [1 -> Build board    2 -> Play game] (Option)
-    // 0 -> No      1-> 2 players       2-> AI (Mode)
-    // option 4 -> setting
+    
     bool isOver=0;
     int time=0,used=0,dem=0,score[2]={0,0};
     bool fadeOut=0;
     double a=0;
-    int x=rand()%(1200-500),y=rand()%(800-300);
+    
     Button* startbutton = new StartButton(600-250/2,400-85/2,600+250/2,400+85/2);
     Button* modebutton = new ModeButton(600-250/2,400-85/2+100,600+250/2,400+85/2+100);
     Button* settingbutton = new SettingButton(600-250/2,400-85/2+200,600+250/2,400+85/2+200);
@@ -89,12 +89,8 @@ int main () {
     Player* player1 = new Player();
     Player* player2 = new Player();
 
-
-
-
-    // mode
-    Button* leftbutton= new LevelButton(400,500,435,535,-1,game.LeftButton);
-    Button* rightbutton= new LevelButton(770,500,805,535,1,game.RightButton);
+    Button* leftbutton= new LevelButton(450,540,485,575,-1,game.LeftButton);
+    Button* rightbutton= new LevelButton(720,540,755,575,1,game.RightButton);
 
 
     vector<Button*> button;
@@ -123,7 +119,7 @@ int main () {
     InsideButton* redobutton= new RedoButton(100,400,100+game.PassButton.width,400+game.PassButton.height,line);
 
     line="Reset";
-    InsideButton* resetbutton= new ResetButton(100,500,100+game.PassButton.width,500+game.PassButton.height,line);
+    InsideButton* resetbutton= new ResetButton(100,500,100+game.PassButton.width,500+game.PassButton.height,line,0);
 
     line="Save";
     InsideButton* savebutton= new SaveButton(100,600,100+game.PassButton.width,600+game.PassButton.height,line);
@@ -134,7 +130,8 @@ int main () {
     QuitButton* quitbutton= new QuitButton();
 
     line="Play Again";
-    InsideButton* playagain= new ResetButton(500,600,500+game.PassButton.width,600+game.PassButton.height,line);
+    InsideButton* playagain= new ResetButton(500,600,500+game.PassButton.width,600+game.PassButton.height,line,1);
+    
 
     CloseGameButton* closegamebutton= new CloseGameButton();
 
@@ -147,6 +144,9 @@ int main () {
     insidebutton.push_back(savebutton);
     insidebutton.push_back(loadbutton);
 
+
+    future<pair<int,int>>  futureAI;
+    bool isAIRunning=0;
     while (WindowShouldClose() == false){
 
         UpdateMusicStream(game.music[game.isSound].first);
@@ -164,7 +164,7 @@ int main () {
             {
                 if (game.mode==0)
                 {
-                    DrawInvalidOption(game,x,y);
+                    DrawInvalidOption(game);
                     if (used==0)
                     {
                         time=GetTime();
@@ -174,10 +174,9 @@ int main () {
                         time=0;
                         used=0;
                         startbutton->used=0;
-                        x=rand()%(1200-500),y=rand()%(800-300);
+                        
                     }
                 } 
-                
                 
                 else 
                 {
@@ -194,8 +193,6 @@ int main () {
             else
             if (modebutton->used==1)
             {
-                //Draw2Options(game);
-                //InputOptions(game,modebutton);
                 twooptions->Input_Draw(game,modebutton);
                 if (twooptions->isFirstTime){
                     leftbutton->Input(game);
@@ -209,7 +206,6 @@ int main () {
             if (settingbutton->used==1)
             {
                 PopUp(game, button);
-                
             }
 
             else
@@ -220,36 +216,55 @@ int main () {
             int invalid=0;
             DrawBoard(game);
 
-            game.dem=0;
-            if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0)
+            
+            if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0 && resetbutton->isUsing()==0)
             {
-                quitbutton->Input_Draw(game);
+                
                 if (game.PlayerPos==1)
                 {
                     player1->InputStone(game,invalid);
                 } else 
                 {
-                    if (game.mode==2) AI(game);
-                    player2->InputStone(game, invalid);
-                    cout<<game.dem<<endl;
+                    if (game.mode==2) 
+                    {
+                        if (!isAIRunning)
+                        {
+                            isAIRunning=1;
+                            
+                            futureAI= async(launch::async,AI,gameCopy(game));
+                        }
+                        if (isAIRunning)
+                        {
+                            if (futureAI.wait_for(0ms) == future_status::ready)
+                            {
+                                auto AIMove= futureAI.get();
+
+                                game.AIMove=AIMove;
+                                player2->InputStone(game, invalid);
+                                isAIRunning=0;
+                            }
+                        }
+                    } else player2->InputStone(game, invalid);
+
+                    
                 }
             }
             
-            
-
 
             for (InsideButton* a:insidebutton) 
             {
-                if (!isOver && savebutton->isUsing()==0 && loadbutton->isUsing()==0) a->Input(game);
+                if (!isOver && !isAIRunning && savebutton->isUsing()==0 && loadbutton->isUsing()==0 && resetbutton->isUsing()==0) a->Input(game);
                 a->Draw(game);
             }
+            resetbutton->Warning(game);
             savebutton->SaveDraw(game);
             loadbutton->LoadDraw(game);
+            quitbutton->Input_Draw(game);
             isValid(game,invalid,used,time,line);
             
             GameOver(game,isOver,score, playagain);
         }
-        //cout<<game.mode<<' '<<game.level<<endl;
+        
         EndDrawing();
         if (game.isClose) break;
     }

@@ -1,14 +1,23 @@
 #include "include/AI.h"
 using namespace std;
-int inf=1e9;
-int used=10;
-int atari_score[3]{0,2000,1000};
+int inf=1e8;
+int used[]={0,3,5,6,10,10,20};
+int atari_score[3]{0,30000,10000};
 int dx[]={0,0,-1,1};
 int dy[]={-1,1,0,0};
 int distanceInfluence[]={100,50,25,12,6};
-bool ck1[23][23];
+bool ck1[23][23], ck2[403];
 vector<vector<int>> board (23, vector<int>(23,0));
 bool emptyCell[23][23];
+int group[23][23], sz[403];
+
+int type_stone[]={0,-5,-1,1,10,5};
+
+
+
+
+
+int score_connect=0;
 pair<int,int> OptimalMove;
 
 
@@ -22,13 +31,18 @@ struct ff
 void Atari(State &game)
 {
     for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) ck1[x][y]=emptyCell[x][y]=0;
+    
+    int type=0;
+    score_connect=0;
     for (int x=1;x<=19;x++)
     {
         for (int y=1;y<=19;y++)
         {
             if (game.board[x][y] && !ck1[x][y])
             {
-                game.dem++;
+                
+
+                type++; 
                 queue<pair<int,int>> q;
                 vector<pair<int,int>> pos;
                 int cnt=0, sum=0;
@@ -36,8 +50,11 @@ void Atari(State &game)
                 q.push({x,y});
                 while(q.size())
                 {
-                    game.dem++;
+                    
+                    
                     pair<int,int> node=q.front();
+                    group[node.first][node.second]=type; 
+                    
                     q.pop();
                     sum++;
                     for (int i=0;i<4;i++)
@@ -67,11 +84,11 @@ void Atari(State &game)
                 {
                     for (pair<int,int> c: pos)
                     {
-                        game.HeuristicMap[c.first][c.second] = atari_score[cnt]+sum;
-                        //cout<<c.first<<' '<<c.second<<"ATARI"<<endl;
+                        game.HeuristicMap[c.first][c.second] += atari_score[cnt]+sum;
+                        
                     }
                     
-                    //cout<<1<<endl;
+                    
                 }
                 for (pair<int,int> c: pos)
                 {
@@ -80,6 +97,9 @@ void Atari(State &game)
 
                     
                 }
+
+                sz[type]=sum;
+                if (game.board[x][y]==2) score_connect+=sum*sum;
                 
             }
             
@@ -90,7 +110,7 @@ void Atari(State &game)
 }
 
 
-void Manhattan(State &game)
+void Local(State &game)
 {
     for (int x=1;x<=19;x++)
     {
@@ -102,17 +122,20 @@ void Manhattan(State &game)
                 {
                     for (int v=-2;v<=2;v++)
                     {
-                        game.dem++;
-                        if (x+u>=1 && x+u<=19 && y+v>=1 && y+v<=19 && !game.board[x+u][y+v]) // o vuong 5x5 va la o trong
+                        
+                        if (x+u>=1 && x+u<=19 && y+v>=1 && y+v<=19 && !game.board[x+u][y+v]) 
                         {
-                            
-                            game.HeuristicMap[x+u][y+v]=0;
+                            int posX=min(x+u,20-x-u), posY=min(y+v,20-y-v);
+                            game.HeuristicMap[x+u][y+v]=type_stone[min({posX,posY,5})];
+                            if (posX<=4 && posY<=4 && posX>=3 && posY>=3) game.HeuristicMap[x+u][y+v]+=100;
+
                         }
                     }
                 }
             }
         }
     }
+    
 }
 
 void Influence(State &game)
@@ -123,15 +146,15 @@ void Influence(State &game)
         {
             if (game.board[x][y])
             {
-                int mul=1; // if == 2 -> AI
+                int mul=1; 
                 if (game.board[x][y]==1) mul=-1;
                 for (int u=-4;u<=4;u++)
                 {
                     for (int v=-4;v<=4;v++)
                     {
-                        game.dem++;
+                        
                         int d=abs(u)+abs(v);
-                        if (d<=4 && x+u>=1 && x+u<=19 && y+v>=1 && y+v<=19) // manhattan <=4 include current cell
+                        if (d<=4 && x+u>=1 && x+u<=19 && y+v>=1 && y+v<=19) 
                         {
                             game.InfluenceMap[x+u][y+v]+=distanceInfluence[d]*mul;
                         }
@@ -147,14 +170,14 @@ void Influence(State &game)
 
 void SufWork(State &game)
 {
-    game.SaveBoard.pop_back(); // return old ver
+    game.SaveBoard.pop_back(); 
     for (int x=1;x<=19;x++)
     {
         for (int y=1;y<=19;y++)
         {
 
-            game.dem++;
-            game.board[x][y]=game.SaveBoard.back()[x][y]; // set to old ver
+            
+            game.board[x][y]=game.SaveBoard.back()[x][y]; 
         }
     }
     game.PlayerPos=(game.PlayerPos==1?2:1);
@@ -170,7 +193,7 @@ void preWork(State &game, ff node, int &invalid, int cur)
     {
         for (int y=1;y<=19;y++)
         {
-            game.dem++;
+            
             board[x][y]=game.board[x][y];
         }
     }
@@ -179,15 +202,15 @@ void preWork(State &game, ff node, int &invalid, int cur)
     game.board[node.x][node.y]=cur;
     
     int c;
-    CaptureStone(game,invalid,c); // invalid or not?
+    CaptureStone(game,invalid,c);
     if (invalid)
     {
         for (int x=1;x<=19;x++) 
         {
             for (int y=1;y<=19;y++)
             {
-                game.dem++;
-                game.board[x][y]=board[x][y]; // return old ver
+                
+                game.board[x][y]=board[x][y]; 
             }
         }
                 
@@ -198,11 +221,11 @@ void preWork(State &game, ff node, int &invalid, int cur)
         {
             for (int y=1;y<=19;y++)
             {
-                game.dem++;
+                
                 board[x][y]=game.board[x][y];
             }
         }
-        game.SaveBoard.push_back(board); // update & gameBoard already updated
+        game.SaveBoard.push_back(board); 
 
         game.PlayerPos=(game.PlayerPos==1?2:1);
 
@@ -214,82 +237,181 @@ void preWork(State &game, ff node, int &invalid, int cur)
 
 }
 
-int Evaluate(State &game)
+void Connect_Suicide(State &game, bool maximize)
 {
-
-    // Using the last Influence and board
-    
-    
-    
-    // Using boundary and limit to calculate score
-    // To make sure that if one place is too high or low, it wont get more penalty or bonus
-
-
-    int score=0;
-    int c=0;
+    int cur,enemy;
+    if (maximize) cur=2,enemy=1; else cur=1,enemy=2;
     for (int x=1;x<=19;x++)
     {
         for (int y=1;y<=19;y++)
         {
-            game.dem++;
-            int cost=0,Influence=game.InfluenceMap[x][y];
-            if (game.board[x][y]==2) // AI
-            {
-                c++;
-               
-                if (Influence<=-50) cost=-200; // Waste one move and one stone
-                else if (Influence<0) cost=90; else cost=100;
-                //cost=10000;
+            
+            if (game.board[x][y]==0)
+            {   
+                int sum=0,cost=0, dif=0, near_enemy=0, idGroup=0,libs_around=0;
+                
+                pair<int,int> node;
+                for (int i=0;i<4;i++)
+                {
+                    int u=x+dx[i],v=y+dy[i];
+                    if (game.board[u][v]==cur && !ck2[group[u][v]])
+                    {
 
-                // If Influence is too low, mean that this stone is very weak
-                // Guarantee that it still get a bonus score
+                        dif++;
+                        idGroup=group[u][v];
+                        int d=sz[group[u][v]];
+                        sum+=d;
+                        cost-=d*d;
+                        ck2[group[u][v]]=1;
+                    }
+                    if (game.board[u][v]==enemy) near_enemy=1;
+                    if (game.board[u][v]==0) libs_around++;
+                }
+                cost+=sum*sum;
+                if (game.HeuristicMap[x][y]<25000) 
+                {
+                
+                    
+                    
+                    if (dif==1 && !near_enemy) 
+                    {
+                        int libs=-1;
+                        for (int i=0;i<4;i++)
+                        {
+                            int u=x+dx[i],v=y+dy[i];
+                            if (u>=1 && u<=19 && v>=1 && v<=19)
+                            {
+                                
+                                int success=1;
+                                for (int j=0;j<4;j++)
+                                {
+                                    int u_new=u+dx[j],v_new=v+dy[j];
+                                    if (u_new>=1 && u_new<=19 && v_new>=1 && v_new<=19)
+                                    {
+                                        if (group[u_new][v_new]==idGroup) 
+                                        {
+                                            success=0;
+                                            break;
+                                        }
+                                    }
+                                }
+                                libs+=success;
+                            }
+                        }
+                        if (libs<0) game.HeuristicMap[x][y]=-inf;
+                    }
+                    
+
+                    if (dif>1 && !near_enemy && libs_around==0) 
+                    {
+                        game.HeuristicMap[x][y]=-inf;
+                    }
+                }
+                
+
+
+                for (int i=0;i<4;i++)
+                {
+                    int u=x+dx[i],v=y+dy[i];
+                    if (game.board[u][v]==cur) ck2[group[u][v]]=0;
+                }
+                
+                game.HeuristicMap[x][y]+=cost*10+(cost>0?200:0);
+
+
+
+                
+
             }
-            if (game.board[x][y]==1) // Player
-            {
-                
-                if (Influence>=50) cost=200;
-                else if (Influence>0) cost=-90*2; else cost=-100*2;
-                cost=-1000;
-                
-            }
-            if (game.board[x][y]==0) // empty cell
-            {
-                
-                if (Influence>100) Influence=100;
-                if (Influence<-100) Influence=-100;
-                cost=Influence/2;
-                
-                // To know if this cell belong to who, assume that the higher the influence is, the more it belongs to AI
-                // Vice versa
-                // Cannot make 100% sure if this cell belongs to who
-            }
-            score+=cost;
+            
+
         }
     }
-    //cout<<c<<' ';
-    return score;
+}
+
+
+int Evaluate(State &game)
+{
+
+    
+    int score=0;
+    
+    for (int x=1;x<=19;x++)
+    {
+        for (int y=1;y<=19;y++)
+        {
+            
+            int cost=0;
+            
+            if (game.board[x][y]==2)
+            {
+                cost=1000;
+                int posX=min(x,20-x), posY=min(y,20-y);
+                cost+=type_stone[min({posX,posY,5})];
+                if (posX<=4 && posY<=4 && posX>=3 && posY>=3) cost+=100;
+                
+            }
+            if (game.board[x][y]==1)
+            {
+                
+                cost=-1000;
+                int posX=min(x,20-x), posY=min(y,20-y);
+                cost-=type_stone[min({posX,posY,5})];
+                if (posX<=4 && posY<=4 && posX>=3 && posY>=3) cost-=100;
+                
+            }
+            if (game.board[x][y]==0)
+            {
+                int Influence=game.InfluenceMap[x][y];
+                if (Influence>65) Influence=65;
+                if (Influence<-65) Influence=-65;
+                score+=Influence/20;
+            }
+            score+=cost;
+
+
+        }
+    }
+    
+    return score+score_connect;
 
 }
 
 
-int minimax(int depth, int alpha, int beta, bool maximize, State &game)
-{
-    //game.dem++;
 
-    if (depth==0)
+
+int minimax(int depth, int alpha, int beta, bool maximize, State &game, int pass_move)
+{
+    
+    long long hash=game.keyturn[game.PlayerPos];
+    
+    for (int x=1;x<=19;x++)
     {
-        for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) game.InfluenceMap[x][y]=0;
-        Influence(game);
-        return Evaluate(game);
+        for (int y=1;y<=19;y++)
+        {
+            hash^=game.zorHash[x][y][game.board[x][y]];
+        }
+    }
+    auto it=game.usedState.find(hash);
+    if (it!=game.usedState.end())
+    {
+        return (*it).second;
     }
     
+    if (depth==0 || pass_move==2)
+    {
+        
+        int score=Evaluate(game);
+        game.usedState[hash]=score;
+        return score;
+    }
+    
+    
 
-    // Delete cells which reduce liberties (call them as Xcell) and vice versa
-
-    // Only Xcells is ABSOLUTE unacceptable
+    
 
 
-    // Heuristic for cell
+    
     vector<ff> OptimalCell;
     for (int x=1;x<=19;x++)
     {
@@ -301,21 +423,17 @@ int minimax(int depth, int alpha, int beta, bool maximize, State &game)
     }
 
     
-    Manhattan(game); // Allow necessary moves -> reset value to 0 (Around stones)
+    Local(game);
     
 
-    Atari(game); // Prioritize emergent moves -> set value (Liberties of both AI and Stone)
+    Atari(game);
     
-    Influence(game); // Build a map for checking safety (+ for close to AI, - for close to player)
+    Influence(game);
 
-    //Bonus score for connect 2 components
-
-    //
+    Connect_Suicide(game,maximize);
 
 
-    //
-
-    // After heuristic, check if Illegal or not
+    
 
     if (maximize)
     {
@@ -327,51 +445,68 @@ int minimax(int depth, int alpha, int beta, bool maximize, State &game)
             {
                 if (game.HeuristicMap[x][y]>=-10000)
                 {
-                    int cost=game.HeuristicMap[x][y]-abs(game.InfluenceMap[x][y]); // Too close to teammate or opponent get a penalty
+                    int cost=game.HeuristicMap[x][y]-abs(game.InfluenceMap[x][y]);
                     OptimalCell.push_back({cost,x,y});
                 }
             }
         }
-        //cout<<OptimalCell[0].x<<' '<<OptimalCell[0].y<<endl;
-        sort(OptimalCell.begin(),OptimalCell.end(),[](ff u, ff v){return u.val>v.val;});
-        //if (OptimalCell[0].val>=1500) cout<<1<<endl;
-
-
-        // After this sort, game.HeuristicMap and game.InfluenceMap is unnecessary
-        // Except in depth 1, when move to depth 0, the loop does not change these, only using for calculate score
-
-        // Only game.Board and game.SaveBoard using their old ver through each loop
-
-        // Consider pass move
-        int maxValue=-inf;
-        for (int i=0;i<min(used,(int)OptimalCell.size());i++)
+        if (OptimalCell.size()==0)
         {
+            srand(time(NULL));
+            OptimalCell.push_back({0,rand()%19+1,rand()%19+1});
+        }
+        
+        sort(OptimalCell.begin(),OptimalCell.end(),[](ff u, ff v){return u.val>v.val;});
+
+        
+        int maxValue=-inf,isExist=0,dem=0;
+        for (int i=0;i<OptimalCell.size();i++)
+        {
+            if (dem>used[depth]) break;
+
             int invalid=0;
-            preWork(game,OptimalCell[i],invalid,2); // build board and history board for next depth
+            preWork(game,OptimalCell[i],invalid,2);
             if (!invalid)
             {
-                int val=minimax(depth-1,alpha,beta,0,game);
-                //cout<<"MAX"<<' '<<OptimalCell[i].x<<' '<<OptimalCell[i].y<<' '<<val<<' '<<game.HeuristicMap[4][3]-abs(game.InfluenceMap[4][3])<<' '
-                //<<game.HeuristicMap[OptimalCell[i].x][OptimalCell[i].y]-abs(game.InfluenceMap[OptimalCell[i].x][OptimalCell[i].y])<<endl;
+                dem++;
+                isExist=1;
+                int val=minimax(depth-1,alpha,beta,0,game,0);
+                
                 if (maxValue<val)
                 {
                     maxValue=val;
-                    if (depth==5) game.AIMove={OptimalCell[i].x,OptimalCell[i].y};
+                    if (depth==game.depth) game.AIMove={OptimalCell[i].x,OptimalCell[i].y};
                 }
                 
                 alpha=max(alpha,val);
-                SufWork(game); // return to old ver
+                SufWork(game);
 
                 if (beta<=alpha)
                 {
                     break;
                 }
 
-
             }
 
-        }
+            if (!isExist)
+            {
+                
+                int invalid=0;
+                preWork(game,{0,0},invalid,2);
+                int val=minimax(depth-1,alpha,beta,0,game,pass_move+1);
+                if (maxValue<val)
+                {
+                    maxValue=val;
+                    if (depth==game.depth) game.AIMove={0,0};
+                }
+                alpha=max(alpha,val);
+                SufWork(game);
+            }
+            
+            
 
+        }
+        game.usedState[hash]=maxValue;
         return maxValue;
 
     } else
@@ -384,63 +519,97 @@ int minimax(int depth, int alpha, int beta, bool maximize, State &game)
             {
                 if (game.HeuristicMap[x][y]>=-10000) 
                 {
-                    int cost=game.HeuristicMap[x][y]-abs(game.InfluenceMap[x][y]); // Too close to teammate or opponent get a penalty
+                    int cost=game.HeuristicMap[x][y]-abs(game.InfluenceMap[x][y]);
                     OptimalCell.push_back({cost,x,y});
-                    if (cost>=1000)
-                    {
-                        //cout<<"FOUND THIS"<<' '<<OptimalCell.back().val<<' '<<OptimalCell.back().x<<' '<<OptimalCell.back().y<<endl;
-                    }
+                    
                 }
             }
         }
         sort(OptimalCell.begin(),OptimalCell.end(),[](ff u, ff v){return u.val>v.val;});
-        // After this sort, game.HeuristicMap and game.InfluenceMap is unnecessary
-        // Only game.Board and game.SaveBoard using their old ver through each loop
-        // Consider pass move
-        int minValue=inf;
         
-        int dd=game.InfluenceMap[4][3];
-        
-        for (int i=0;i<min(used,(int)OptimalCell.size());i++)
+        int minValue=inf,isExist=0,dem=0;
+
+        for (int i=0;i<OptimalCell.size();i++)
         {
             int invalid=0;
-            preWork(game,OptimalCell[i],invalid,1); // build board and history board for next depth
-            //cout<<OptimalCell[i].val<<' '<<invalid<<endl;
+            if (dem>used[depth]) break;
+
+            preWork(game,OptimalCell[i],invalid,1);
             if (!invalid)
             {
-                int val=minimax(depth-1,alpha,beta,1,game);
-                
-                /*cout<<"MIN"<<' '<<OptimalCell[i].x<<' '<<OptimalCell[i].y<<' '<<val<<' '<<game.HeuristicMap[4][3]-dd<<' '
-                <<OptimalCell[i].val<<endl;  */
+                dem++;
+                isExist=1;
+                int val=minimax(depth-1,alpha,beta,1,game,0);
                 minValue=min(minValue,val);
                 beta=min(beta,val);
-                SufWork(game); // return to old ver
+                SufWork(game);
 
                 if (beta<=alpha)
                 {
                     break;
                 }
 
-
             }
 
         }
+        if (!isExist)
+        {
+            int invalid=0;
+            preWork(game,{0,0},invalid,1);
+            int val=minimax(depth-1,alpha,beta,1,game,pass_move+1);
+            minValue=min(minValue,val);
+            beta=min(beta,val);
+            SufWork(game);
 
+        }
+        game.usedState[hash]=minValue;
         return minValue;
 
 
     }
     
-
-    // Remember to push newboard to game.undo for checking rule
 }
 
 
-
-void AI(State &game)
+State gameCopy(State &game)
 {
-    minimax(5,-inf,inf,1,game);
-    
+    State gameCopy;
+
+    for (int x=1;x<=19;x++)
+    {
+        for (int y=1;y<=19;y++) 
+        {
+            gameCopy.board[x][y]=game.board[x][y];
+            gameCopy.HeuristicMap[x][y]=game.HeuristicMap[x][y];
+            gameCopy.InfluenceMap[x][y]=game.InfluenceMap[x][y];
+            for (int i=0;i<=2;i++)
+            {
+                gameCopy.zorHash[x][y][i]=game.zorHash[x][y][i];
+            }
+        }
+    }
+    gameCopy.PlayerPos=game.PlayerPos;
+    gameCopy.level=game.level;
+    gameCopy.keyturn[1]=game.keyturn[1];
+    gameCopy.keyturn[2]=game.keyturn[2];
+
+    if (game.SaveBoard.size()>=2)
+    {
+        gameCopy.SaveBoard.push_back(game.SaveBoard[game.SaveBoard.size()-2]);
+    }
+    gameCopy.SaveBoard.push_back(game.SaveBoard.back());
+    return gameCopy;
+
+}
+pair<int,int> AI(State game)
+{
+
+    game.usedState.clear();
+    if (game.level==1) game.depth=1;
+    if (game.level==2) game.depth=3;
+    if (game.level==3) game.depth=6;
+    minimax(game.depth,-inf,inf,1,game,0);
+    return game.AIMove;
     
 }
 

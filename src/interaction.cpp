@@ -19,8 +19,9 @@ void MakeSoundEndGame(State &game)
 
 void isValid(State &game, int &invalid, int &used, int &time, string &line)
 {
-    if (invalid==3) line="  CAPTURE! ";
-    if (invalid==2) line="KO THREATS!";
+    float c=0;
+    if (invalid==3) line="  CAPTURE! ",c=5;
+    if (invalid==2) line="  KO RULE! ",c=10;
     if (invalid==1) line="NO SUICIDE!";
     if (invalid)
     {
@@ -36,7 +37,7 @@ void isValid(State &game, int &invalid, int &used, int &time, string &line)
             } else 
             {
                 DrawRectangleRounded(
-                    Rectangle{400,300,530,100},
+                    Rectangle{395,300,505-c,100},
                     0.5,
                     20,
                     Color{255,255,255,100}
@@ -63,7 +64,7 @@ position real_pos(Vector2 mousePos, int cell_sz)
 void Player::InputStone(State &game, int &invalid)
 {
 
-    // AI
+    
 
     vector<vector<int>> board (23, vector<int>(23,0));
 
@@ -72,14 +73,15 @@ void Player::InputStone(State &game, int &invalid)
         MakeSound(game);
             
         game.board[game.AIMove.first][game.AIMove.second]=2;
-                
+        game.board[0][1]=game.AIMove.first;
+        game.board[0][2]=game.AIMove.second;
         int getscore=0;
-        CaptureStone(game,invalid,getscore); // 100% legal move
+        CaptureStone(game,invalid,getscore);
                 
         game.PlayerPos=1;
-        for (int x=1;x<=19;x++) 
+        for (int x=0;x<=19;x++) 
         {
-            for (int y=1;y<=19;y++)
+            for (int y=0;y<=19;y++)
             {
                 board[x][y]=game.board[x][y];
             }
@@ -115,14 +117,12 @@ void Player::InputStone(State &game, int &invalid)
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
        {
             MakeSound(game);
-            //Vector2 mousePos = GetMousePosition();
-            //position Pos=real_pos(mousePos,game.cell_sz);
-            //Pos.x-=game.outside;
+            
             if (Pos.x/game.cell_sz>=1 && Pos.x/game.cell_sz<=game.size && Pos.y/game.cell_sz>=1 && Pos.y/game.cell_sz<=game.size && game.board[Pos.x/game.cell_sz][Pos.y/game.cell_sz]==0)
             {
-                for (int x=1;x<=19;x++) 
+                for (int x=0;x<=19;x++) 
                 {
-                    for (int y=1;y<=19;y++)
+                    for (int y=0;y<=19;y++)
                     {
                         board[x][y]=game.board[x][y];
                     }
@@ -133,9 +133,9 @@ void Player::InputStone(State &game, int &invalid)
                 CaptureStone(game,invalid,getscore);
                 if (invalid)
                 {
-                    for (int x=1;x<=19;x++) 
+                    for (int x=0;x<=19;x++) 
                     {
-                        for (int y=1;y<=19;y++)
+                        for (int y=0;y<=19;y++)
                         {
                             game.board[x][y]=board[x][y];
                         }
@@ -143,10 +143,13 @@ void Player::InputStone(State &game, int &invalid)
                     
                 } else
                 {
+                    
+                    game.board[0][1]=Pos.x/game.cell_sz;
+                    game.board[0][2]=Pos.y/game.cell_sz;
                     game.PlayerPos=(game.PlayerPos==1?2:1);
-                    for (int x=1;x<=19;x++) 
+                    for (int x=0;x<=19;x++) 
                     {
-                        for (int y=1;y<=19;y++)
+                        for (int y=0;y<=19;y++)
                         {
                             board[x][y]=game.board[x][y];
                         }
@@ -160,7 +163,7 @@ void Player::InputStone(State &game, int &invalid)
                     game.Redo.clear();
                 }
             }
-            //cout<<Pos.x<<' '<<Pos.y<<endl;
+            
        }
 }
 
@@ -178,11 +181,12 @@ void InsideButton::SaveGame(State &game, char filename[]){}
 void InsideButton::LoadDraw(State &game){}
 void InsideButton::LoadGame(State &game, string filename){}
 bool InsideButton::isUsing(){}
+void InsideButton::Warning(State &game){}
 void InsideButton::Draw(State &game)
 {
-    int c=0,k=0;
+    int c=0,k=0,p=0;
     if (line=="Reset") c=8;
-    if (line=="Play Again") c=47,k=5;
+    if (line=="Play Again") c=47,k=5,p=3;
     if (InsideButton::Inside())
     {
         DrawTexturePro(
@@ -198,7 +202,7 @@ void InsideButton::Draw(State &game)
     } else
     {
         DrawTexture(game.PassButton,x,y,WHITE);
-        DrawTextEx(game.Font,line.c_str(),Vector2{x+65-c,y+10},40-k,3,BLACK);
+        DrawTextEx(game.Font,line.c_str(),Vector2{x+65-c+p,y+10+p},40-k,3,BLACK);
     }
 }
 
@@ -209,8 +213,9 @@ void PassButton::Input(State &game)
         MakeSound(game);
         game.PlayerPos=(game.PlayerPos==1?2:1);
         game.Redo.clear();
+        game.board[0][1]=game.board[0][2]=0;
         vector<vector<int>> board (23, vector<int>(23,0));
-        for (int x=1;x<=19;x++) for (int y=1;y<=19;y++) board[x][y]=game.board[x][y];
+        for (int x=0;x<=19;x++) for (int y=0;y<=19;y++) board[x][y]=game.board[x][y];
         game.SaveBoard.push_back(board);
         
     }
@@ -229,9 +234,9 @@ void UndoButton::Input(State &game)
             game.SaveBoard.pop_back();
             game.Redo.push_back(game.SaveBoard.back());
             game.SaveBoard.pop_back();
-            for (int x=1;x<=19;x++)
+            for (int x=0;x<=19;x++)
             {
-                for (int y=1;y<=19;y++) game.board[x][y]=game.SaveBoard[game.SaveBoard.size()-1][x][y];
+                for (int y=0;y<=19;y++) game.board[x][y]=game.SaveBoard[game.SaveBoard.size()-1][x][y];
             }
         }
         
@@ -249,27 +254,61 @@ void RedoButton::Input(State &game)
             game.Redo.pop_back();
             game.SaveBoard.push_back(game.Redo.back());
             game.Redo.pop_back();
-            for (int x=1;x<=19;x++)
+            for (int x=0;x<=19;x++)
             {
-                for (int y=1;y<=19;y++) game.board[x][y]=game.SaveBoard[game.SaveBoard.size()-1][x][y];
+                for (int y=0;y<=19;y++) game.board[x][y]=game.SaveBoard[game.SaveBoard.size()-1][x][y];
             }
         }
         
     }
 }
-
+bool ResetButton:: isUsing()
+{
+    return used;
+}
 void ResetButton::Input(State &game)
 {
     if (InsideButton::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         MakeSound(game);
+        
+        used=1;
+
+        if (share_for_playagain)
+        {
+            while(game.SaveBoard.size()>=2) game.SaveBoard.pop_back();
+            game.Redo.clear();
+            for (int x=0;x<=19;x++)
+            {
+                for (int y=0;y<=19;y++) game.board[x][y]=0;
+            }
+            game.PlayerPos=1;
+            used=0;
+        }
+        
+        
+    }
+}
+
+void ResetButton::Warning(State &game)
+{
+    if (!used) return;
+    if (GuiWindowBox({600-420/2,400-220/2,420,220},"Reset Game") || GuiButton({470,450,120,40},"CANCEL"))
+    {
+        used=0;
+    }
+    Vector2 size=MeasureTextEx(game.Font,"ARE YOU SURE?",50,5);
+    DrawTextEx(game.Font,"ARE YOU SURE?",{600-size.x/2,360},50,5,{65,65,65,255});
+    if (GuiButton({610,450,120,40},"RESET"))
+    {
         while(game.SaveBoard.size()>=2) game.SaveBoard.pop_back();
         game.Redo.clear();
-        for (int x=1;x<=19;x++)
+        for (int x=0;x<=19;x++)
         {
-            for (int y=1;y<=19;y++) game.board[x][y]=0;
+            for (int y=0;y<=19;y++) game.board[x][y]=0;
         }
         game.PlayerPos=1;
+        used=0;
     }
 }
 
@@ -330,16 +369,16 @@ bool SaveButton::isUsing()
 void LoadButton::LoadGame(State &game, string filename)
 {
     ifstream fin("save/"+filename);
-    //cout<<filename<<endl;
+    
     json j;
     fin>>j;
     fin.close();
     game.SaveBoard=j["SaveBoard"];
     game.Redo=j["Redo"];
 
-    for (int x=1;x<=19;x++)
+    for (int x=0;x<=19;x++)
     {
-        for (int y=1;y<=19;y++)
+        for (int y=0;y<=19;y++)
         {
             game.board[x][y]=game.SaveBoard[game.SaveBoard.size()-1][x][y];
         }
@@ -392,7 +431,7 @@ void LoadButton::LoadDraw(State &game)
     {
         if (rowClick>=0 && rowClick<game.filelist.size())
         {
-            //cout<<1<<endl;
+            
             LoadGame(game, game.filelist[rowClick]);
             
         }
@@ -415,19 +454,30 @@ void QuitButton::Input_Draw(State &game)
         game.option=0;
     }
 }
+bool cmp(vector<vector<int>>& board1, vector<vector<int>>& board2)
+{
+    for (int x=1;x<=19;x++)
+    {
+        for (int y=1;y<=19;y++)
+        {
+            if (board1[x][y]!=board2[x][y]) return 0;
+        }
+    }
+    return 1;
+}
 void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain)
 {
     if (game.SaveBoard.size()>=3)
     {
         
         int sz=game.SaveBoard.size()-1;
-        if (game.SaveBoard[sz]==game.SaveBoard[sz-1] && game.SaveBoard[sz-1]==game.SaveBoard[sz-2])
+        if (cmp(game.SaveBoard[sz],game.SaveBoard[sz-1]) && cmp(game.SaveBoard[sz-1],game.SaveBoard[sz-2]))
         {
 
-            if (!isOver) // first time
+            if (!isOver) 
             {
                 CountScore(game,score[0],score[1]);
-                //cout<<score[0]<<' '<<score[1]<<endl;
+                
                 MakeSoundEndGame(game);
                 isOver=1;
             }
@@ -455,7 +505,7 @@ void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain)
             
             string player1=to_string(score[0]);
             string player2=to_string(score[1]);
-            //cout<<score[0]<<' '<<score[1]<<endl;
+            
             if (score[0]==score[1])
             {
                 
@@ -474,12 +524,12 @@ void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain)
                 DrawTextEx(game.Font,"WHITE WIN!",Vector2{600-230+3,400-220+3},100,5,LIGHTGRAY);
                 DrawTextEx(game.Font,"WHITE WIN!",Vector2{600-230,400-220},100,5,BLACK);
             }
-            //cout<<player1<< ' '<<player2<<endl;
+            
             player1="BLACK: "+player1;
             player2="WHITE: "+player2;
             DrawTextEx(game.Font,player1.c_str(),Vector2{600-230,400-220+200},50,3,BLACK);
             DrawTextEx(game.Font,player2.c_str(),Vector2{600-230,400-220+300},50,3,BLACK);
-
+            
             playagain->Input(game);
             playagain->Draw(game);
             if (game.SaveBoard.size()==1)
@@ -489,21 +539,7 @@ void GameOver(State &game, bool &isOver, int score[], InsideButton* playagain)
             }
 
             
-            
-            
-            
-
-            /*for (Button* a:button)
-            {
-                
-                a->Draw(game);
-                a->Input(game);
-
-            }*/
-
-
-
-
+        
         }
     }
 }

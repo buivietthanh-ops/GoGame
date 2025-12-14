@@ -14,7 +14,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
     {
         for (int y_cur=1;y_cur<=19;y_cur++)
         {
-            game.dem++;
+            
             if (game.board[x_cur][y_cur] && ck[x_cur][y_cur]==0)
             {
                 int cnt=0;
@@ -25,7 +25,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
                 
                 while(q.size())
                 {
-                    game.dem++;
+                    
                     pair<int,int> pos=q.front();
                     q.pop();
                     d.push_back(pos);
@@ -49,7 +49,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
         }
     }
     if (contain.size()>0) getscore=1;
-    if (ktr[game.PlayerPos]==0) // No suicide
+    if (ktr[game.PlayerPos]==0)
     {
         for (pair<int,int> pos:contain)
         {
@@ -57,7 +57,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
         }
         return;
     }
-    if (ktr[game.PlayerPos]==1 && ktr[(game.PlayerPos==1?2:1)]==0) // Suicide but not get score
+    if (ktr[game.PlayerPos]==1 && ktr[(game.PlayerPos==1?2:1)]==0)
     {
         invalid=1;
         return;
@@ -76,7 +76,7 @@ void CaptureStone(State &game, int &invalid, int &getscore)
         }
     }
 
-    if (!dif) // Ko threats
+    if (!dif)
     {
         invalid=2;
 

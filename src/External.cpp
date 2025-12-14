@@ -20,33 +20,6 @@ void transition(double &a, bool &fadeOut)
 }
 
 
-/*void InputOptions(State &game, Button* modebutton)
-{   // -> Draw2Options
-    
-     Vector2 mousePos=GetMousePosition();
-    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=200 && mousePos.y<=325)
-    {
-        if (game.curPlayers==0) MakeSound(game),game.curPlayers=1;
-        DrawTexture(game.TwoPlayers,469-30,200-30,WHITE);
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            game.mode=1;
-            modebutton->used=0;
-        }
-
-    } else game.curPlayers=0;
-    if (mousePos.x>=469 && mousePos.x<=785 && mousePos.y>=471 && mousePos.y<=600)
-    {
-        if (game.curComputer==0) MakeSound(game),game.curComputer=1;
-        DrawTexture(game.Computer,469-30,471-30,WHITE);
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            game.mode=2;
-            modebutton->used=0;
-        }
-    } else game.curComputer=0;
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) MakeSound(game);
-}*/
 
 void TwoOptions:: Input_Draw(State &game, Button* modebutton)
 {
@@ -58,26 +31,53 @@ void TwoOptions:: Input_Draw(State &game, Button* modebutton)
         }
         return;
     }
-    if (GuiWindowBox(Rectangle{600-800/2,400-500/2,800,500},"Mode"))
+    
+    float w=game.PassButton.width,h=game.PassButton.height;
+    DrawTexture(game.ModeBox,600-game.ModeBox.width/2,400-game.ModeBox.height/2,WHITE);
+    Vector2 size = MeasureTextEx(game.Font, "SELECT GAME MODE", 50, 5);
+    DrawTextEx(game.Font,"SELECT GAME MODE",{600-size.x/2+3, 400.0f-game.ModeBox.height/2+50+3},50,5,LIGHTGRAY);
+    DrawTextEx(game.Font,"SELECT GAME MODE",{600-size.x/2, 400.0f-game.ModeBox.height/2+50},50,5,BLACK);
+    Vector2 MousePos=GetMousePosition();
+    DrawTexture(game.PassButton,600-w/2,320,WHITE);
+    if (MousePos.x>=600-w/2 && MousePos.x<=600+w/2 && MousePos.y>=320 && MousePos.y<=320+h)
     {
-        isFirstTime=0;
-        modebutton->used=0;
-        return;
-    }
+        
+        DrawTextEx(game.Font,"PVP",Vector2{600-w/2+60+3,320+10+3},50,5,LIGHTGRAY);
+        DrawTextEx(game.Font,"PVP",Vector2{600-w/2+60,320+10},50,5,BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            
+            MakeSound(game);
+            isFirstTime=0;
+            game.mode=1;
+            modebutton->used=0;
 
-    if (GuiButton(Rectangle{450,320,300,60},"Two Players"))
-    {
-        isFirstTime=0;
-        game.mode=1;
-        modebutton->used=0;
-    }
+        }
+    } else DrawTextEx(game.Font,"PVP",Vector2{600-w/2+60,320+10},50,5,BLACK);
 
-    if (GuiButton(Rectangle{450,420,300,60},"Computer"))
+    
+
+    
+    
+
+    DrawTexture(game.PVEBoard,600-game.PVEBoard.width/2,420+game.PassButton.height-2,WHITE);
+    DrawTexture(game.PassButton,600-w/2,420,WHITE);
+
+    if (MousePos.x>=600-w/2 && MousePos.x<=600+w/2 && MousePos.y>=420 && MousePos.y<=420+h)
     {
-        isFirstTime=0;
-        game.mode=2;
-        modebutton->used=0;
-    }
+        
+        DrawTextEx(game.Font,"PVE",Vector2{600-w/2+60+3,420+10+3},50,5,LIGHTGRAY);
+        DrawTextEx(game.Font,"PVE",Vector2{600-w/2+60,420+10},50,5,BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            
+            MakeSound(game);
+            isFirstTime=0;
+            game.mode=2;
+            modebutton->used=0;
+
+        }
+    } else DrawTextEx(game.Font,"PVE",Vector2{600-w/2+60,420+10},50,5,BLACK);
 }
 
 
@@ -94,8 +94,11 @@ void StartButton::Input(State &game)
 {
     if (Button::Inside() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
     {
+        
+        
         MakeSound(game);
         used=1;
+        
     }
 }
 
@@ -103,7 +106,7 @@ void StartButton::Draw(State &game)
 {
     if (Button::Inside())
     {
-        if (Cur==0) MakeSound(game),Cur=1;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)==0 && Cur==0) MakeSound(game),Cur=1;
         DrawTexture(game.ButtonStartFade,x,y,WHITE);
         DrawTextEx(game.Font,"Start",(Vector2){600-150/2+18,400-80/2+6},60,3,BLACK);
     } else 
@@ -294,8 +297,8 @@ void ModernStoneButton::Input(State &game)
 }
 void ModernStoneButton::Draw(State &game)
 {
-    DrawTexture(game.BlackStone,x,y,WHITE);
-    DrawTexture(game.WhiteStone,x+30,y,WHITE);
+    DrawTextureEx(game.BlackStone,{x,y},0.0f,0.167f,WHITE);
+    DrawTextureEx(game.WhiteStone,{x+30,y},0.0f,0.167f,WHITE);
     if (used)
     {
         DrawRectangleRounded(
@@ -708,10 +711,10 @@ void LevelButton::Draw(State &game)
     if (game.level==2) line="Medium";
     if (game.level==3) line="Hard";
     float c=0;
-    if (line=="Medium") c=-10;
-    DrawTextEx(game.Font,line.c_str(),Vector2{567+c,502},35,3,GREEN);
-    DrawTextEx(game.Font,line.c_str(),Vector2{568+c,503},35,3,LIGHTGRAY);
-    DrawTextEx(game.Font,line.c_str(),Vector2{569+c,500},35,3,BLACK);
+    if (line=="Medium") c=-15;
+    
+    DrawTextEx(game.Font,line.c_str(),Vector2{568+c,535},35,3,WHITE);
+    DrawTextEx(game.Font,line.c_str(),Vector2{571+c,538},35,3,{0,0,0,80});
     DrawTexture(image,x,y,WHITE);
 }
 
@@ -728,7 +731,7 @@ void External(State &game, Button* startbutton, Button* modebutton, Button* sett
     }
     game.isClose=closegamebutton->Input_Draw();
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200,100},100,10,LIGHTGRAY); 
-    DrawTextEx(game.Font,"GO GAME",Vector2{600-200-3,100-3},100,10,BLACK); 
+    DrawTextEx(game.Font,"GO GAME",Vector2{600-200-3,100-3},100,10,{35,35,35,255}); 
     DrawTextEx(game.Font,"Choose mode first!",Vector2{800,30},30,10,BLACK);
 }
 
@@ -783,5 +786,7 @@ void DrawFast(State &game)
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200,100},100,10,LIGHTGRAY); 
     DrawTextEx(game.Font,"GO GAME",Vector2{600-200-3,100-3},100,10,BLACK); 
     DrawTextEx(game.Font,"Choose mode first!",Vector2{800,30},30,10,BLACK);
+    CloseGameButton* closegamebutton= new CloseGameButton();
+    game.isClose=closegamebutton->Input_Draw();
 
 }

@@ -33,6 +33,7 @@ class InsideButton
     virtual void LoadDraw(State &game);
     virtual void LoadGame(State &game, string filename);
     virtual bool isUsing();
+    virtual void Warning(State &game);
     void Draw(State &game);
     
     virtual ~InsideButton()= default;
@@ -64,8 +65,11 @@ class RedoButton : public InsideButton
 class ResetButton : public InsideButton
 {
     public:
-    ResetButton(float x1, float y1, float w1, float h1, string line1): InsideButton(x1,y1,w1,h1,line1){}
+    int used,share_for_playagain=0;
+    ResetButton(float x1, float y1, float w1, float h1, string line1, bool share): InsideButton(x1,y1,w1,h1,line1),used(0),share_for_playagain(share){}
     void Input(State &game) override;
+    bool isUsing() override;
+    void Warning(State &game) override;
 };
 
 class SaveButton : public InsideButton
